@@ -1,0 +1,110 @@
+/* src/pages/PosterDetail.css */
+.poster-detail-page {
+  padding: 40px 20px;
+  background: #393939;
+  min-height: 100vh;
+  color: white;
+}
+
+.back-btn {
+  background: #222;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.back-btn:hover {
+  background: #333;
+}
+
+.poster-detail {
+  display: flex;
+  gap: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.poster-image {
+  flex: 1;
+}
+
+.poster-image img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.poster-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.poster-info h1 {
+  font-size: 2.5rem;
+  margin: 0;
+  color: white;
+}
+
+.category {
+  background: #ff8000;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  margin: 0;
+}
+
+.description {
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.price {
+  font-size: 2rem;
+  color: #ff8000;
+  font-weight: bold;
+  margin: 0;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quantity-selector input {
+  background: #222;
+  color: white;
+  border: 2px solid #ff8000;
+  padding: 8px;
+  border-radius: 5px;
+  width: 80px;
+}
+
+.add-to-cart-btn {
+  background: #ff8000;
+  color: white;
+  border: none;
+  padding: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.add-to-cart-btn:hover {
+  background: #e67300;
+}
+
+.loading {
+  color: white;
+  text-align: center;
+  padding: 100px;
+  font-size: 1.5rem;
+}

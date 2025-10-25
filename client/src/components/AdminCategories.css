@@ -1,0 +1,87 @@
+/* src/components/AdminCategories.css */
+.admin-categories {
+  padding: 20px;
+}
+
+.admin-categories h2 {
+  color: #ff8000;
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+.add-category-form {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.add-category-form input {
+  flex: 1;
+  background: #393939;
+  color: white;
+  border: 2px solid #444;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.add-category-form input:focus {
+  outline: none;
+  border-color: #ff8000;
+}
+
+.add-category-form button {
+  background: #ff8000;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.add-category-form button:hover {
+  background: #e67300;
+}
+
+.categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.category-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #333;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.category-card span {
+  color: white;
+  font-size: 1.1rem;
+}
+
+.delete-category-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.delete-category-btn:hover {
+  background: #da190b;
+}
+
+.admin-loading {
+  color: white;
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+}

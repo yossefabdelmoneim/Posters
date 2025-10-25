@@ -1,0 +1,38 @@
+/* src/pages/Home.css */
+.admin-quick-access {
+  background: #222;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.admin-quick-access .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-quick-access h2 {
+  color: #ff8000;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.admin-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-link {
+  background: #ff8000;
+  color: white;
+  text-decoration: none;
+  padding: 15px 30px;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.admin-link:hover {
+  background: #e67300;
+}

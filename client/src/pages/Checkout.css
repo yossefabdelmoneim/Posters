@@ -1,0 +1,129 @@
+/* src/pages/Checkout.css */
+.checkout-page {
+  padding: 40px 20px;
+  background: #393939;
+  min-height: 100vh;
+  color: white;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.checkout-page h1 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2.5rem;
+}
+
+.checkout-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.form-section {
+  background: #222;
+  padding: 30px;
+  border-radius: 10px;
+}
+
+.form-section h3 {
+  color: #ff8000;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form-row:has(input:nth-child(3)) {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.checkout-form input {
+  background: #393939;
+  color: white;
+  border: 2px solid #444;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.checkout-form input:focus {
+  outline: none;
+  border-color: #ff8000;
+}
+
+.place-order-btn {
+  background: #ff8000;
+  color: white;
+  border: none;
+  padding: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.place-order-btn:hover:not(:disabled) {
+  background: #e67300;
+}
+
+.place-order-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+.order-summary {
+  background: #222;
+  padding: 30px;
+  border-radius: 10px;
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+}
+
+.order-summary h3 {
+  color: #ff8000;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #444;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #ff8000;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .checkout-content {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
