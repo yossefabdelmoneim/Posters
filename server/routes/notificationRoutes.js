@@ -1,3 +1,4 @@
+// routes/notificationRoutes.js
 import express from 'express';
 import { requireAdmin, authenticateToken } from '../middlewares/authMiddleware.js';
 import { getNotifications, markNotificationRead } from '../controllers/notificationController.js';

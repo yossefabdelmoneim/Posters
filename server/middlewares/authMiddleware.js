@@ -1,8 +1,9 @@
+// middlewares/authMiddleware.js
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { fileURLToPath } from "url";
 import path from "path";
-import pool from "../config/db.js"; // make sure this is your postgres pool
+import pool from "../config/db.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

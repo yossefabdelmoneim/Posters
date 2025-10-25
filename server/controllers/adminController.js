@@ -1,5 +1,5 @@
+// controllers/adminController.js
 import pool from '../config/db.js';
-import cloudinary from '../config/cloudinary.js';
 import fs from 'fs';
 
 export async function addCategory(req, res) {

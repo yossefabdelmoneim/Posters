@@ -1,3 +1,4 @@
+// controllers/posterController.js
 import pool from '../config/db.js';
 
 export async function getAllPosters(req, res) {

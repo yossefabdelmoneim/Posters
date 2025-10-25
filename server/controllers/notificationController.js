@@ -1,3 +1,4 @@
+// controllers/notificationController.js
 import pool from '../config/db.js';
 
 export async function getNotifications(req, res) {

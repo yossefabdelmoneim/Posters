@@ -1,3 +1,4 @@
+// routes/posterRoutes.js
 import express from 'express';
 import { getAllPosters, getPosterById, getPostersByCategory } from '../controllers/posterController.js';
 const router = express.Router();

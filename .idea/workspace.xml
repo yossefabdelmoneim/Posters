@@ -5,36 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="22505b1f-0b62-4af4-b07f-6a7604b5e477" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/manifest.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/robots.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/App.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/App.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Cart.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Cart.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Categories.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Categories.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/HeroContent.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/HeroContent.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Marquee.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Marquee.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/NavBar.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/NavBar.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ProductGrid.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ProductGrid.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/index.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/HomePage.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/reportWebVitals.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/setupTests.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/server/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitIgnore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitIgnore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/CartSidebar.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/CartSidebar.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Hero.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Hero.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/ProductCard.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/ProductCard.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Orders.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Orders.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/config/cloudinary.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/config/db.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/config/db.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/adminController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/adminController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/authController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/authController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/notificationController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/notificationController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/orderController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/orderController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/posterController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/posterController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/middlewares/authMiddleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/middlewares/authMiddleware.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/middlewares/multer.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/middlewares/multer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/authRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/authRoutes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/notificationRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/notificationRoutes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/orderRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/orderRoutes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/posterRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/posterRoutes.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,9 +38,9 @@
       <list>
         <option value="SQL File" />
         <option value="HTML File" />
-        <option value="JavaScript File" />
         <option value="JSX File" />
         <option value="CSS File" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -74,6 +66,7 @@
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/DELL/PycharmProjects/posters&quot;,
     &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -86,6 +79,14 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\DELL\PycharmProjects\posters" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\DELL\PycharmProjects\posters" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="npm dev" type="js.build_tools.npm">
       <package-json value="$PROJECT_DIR$/package.json" />
@@ -122,7 +123,8 @@
       <workItem from="1761197514409" duration="342000" />
       <workItem from="1761222019638" duration="595000" />
       <workItem from="1761323773936" duration="2370000" />
-      <workItem from="1761416362788" duration="2471000" />
+      <workItem from="1761416362788" duration="3296000" />
+      <workItem from="1761420679318" duration="1440000" />
     </task>
     <servers />
   </component>

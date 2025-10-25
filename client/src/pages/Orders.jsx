@@ -51,7 +51,6 @@ const Orders = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
         <div className="loading">Loading orders...</div>
       </>
     );
