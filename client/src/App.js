@@ -1,75 +1,38 @@
-// src/App.js
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { CartProvider } from "./context/CartContext";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Shop from "./pages/Shop";
-import PosterDetail from "./pages/PosterDetail";
+import {Routes, BrowserRouter, Route} from "react-router-dom";
+import Home from "./pages/Home"
 import Cart from "./pages/Cart";
+import PosterDetail from "./pages/PosterDetail";
 import Checkout from "./pages/Checkout";
-import Orders from "./pages/Orders";
 import AdminDashboard from "./pages/AdminDashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Navbar from "./components/Navbar";
-import "./styles/global.css";
+import Profile from "./pages/Profile";
+import {CartProvider} from "./Context/CartContext";
+import "bootstrap/dist/css/bootstrap.min.css";
+import CategoryPage from "./components/CategoryPage";
+import RequireAuth from "./components/RequireAuth";
 
 function App() {
-  return (
-    <AuthProvider>
-      <CartProvider>
-        <Router>
-          <div className="App">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/poster/:id" element={<PosterDetail />} />
-              <Route
-                path="/cart"
-                element={
-                  <>
-                    <Navbar />
-                    <Cart />
-                  </>
-                }
-              />
-              <Route
-                path="/checkout"
-                element={
-                  <ProtectedRoute>
-                    <Navbar />
-                    <Checkout />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/orders"
-                element={
-                  <ProtectedRoute>
-                    <Navbar />
-                    <Orders />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute adminOnly={true}>
-                    <Navbar />
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
-          </div>
-        </Router>
-      </CartProvider>
-    </AuthProvider>
-  );
+    return (
+        <CartProvider>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<Home/>}/>
+                    <Route path="/category/:categoryId" element={<CategoryPage/>}/>
+                    <Route path="/poster/:id" element={<PosterDetail/>}/>
+                    <Route path="/cart" element={<Cart/>}/>
+                    <Route path="/checkout" element={<Checkout/>}/>
+                    <Route path="/profie" element={<Profile/>}/>
+                    <Route path="/admin" element={<AdminDashboard/>}/>
+                    // Add this route to your existing routes
+                    <Route path="/admin" element={
+                        <RequireAuth>
+                            <AdminDashboard/>
+                        </RequireAuth>
+                    }/>
+                </Routes>
+            </BrowserRouter>
+        </CartProvider>
+    )
 }
 
 export default App;

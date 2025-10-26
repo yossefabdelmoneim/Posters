@@ -1,6 +1,19 @@
 // controllers/adminController.js
 import pool from '../config/db.js';
 import fs from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configure Cloudinary with error handling
+try {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+  console.log('Cloudinary configured successfully');
+} catch (error) {
+  console.error('Cloudinary configuration failed:', error);
+}
 
 export async function addCategory(req, res) {
   try {
@@ -18,18 +31,29 @@ export async function addCategory(req, res) {
 export async function addPoster(req, res) {
   try {
     const { title, description, price, category_id, stock } = req.body;
-    // file is available via multer as req.file
+
     if (!req.file) return res.status(400).json({ message: 'Image file required' });
 
-    // upload to cloudinary
-    const uploadRes = await cloudinary.uploader.upload(req.file.path, { folder: 'posters' });
+    let image_url;
 
-    // remove local temp file
+    try {
+      // Try Cloudinary first
+      const uploadRes = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'posters',
+        resource_type: 'image'
+      });
+      image_url = uploadRes.secure_url;
+    } catch (uploadError) {
+      console.error('Cloudinary upload failed:', uploadError);
+      // Fallback to local path
+      image_url = `/uploads/${req.file.filename}`;
+    }
+
+    // Remove local temp file
     fs.unlink(req.file.path, (err) => {
       if (err) console.error('Failed to delete temp upload:', err);
     });
 
-    const image_url = uploadRes.secure_url;
     const result = await pool.query(
       'INSERT INTO posters (title, description, price, image_url, category_id, stock) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
       [title, description, price, image_url, category_id || null, stock || 0]
@@ -37,8 +61,8 @@ export async function addPoster(req, res) {
     res.json(result.rows[0]);
   }
   catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Poster creation error:', err);
+    res.status(500).json({ message: 'Server error during poster creation' });
   }
 }
 
@@ -66,11 +90,49 @@ export async function editPoster(req, res) {
 }
 
 export async function deletePoster(req, res) {
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN'); // Start transaction
+
+    const { id } = req.params;
+
+    // First, delete all order_items that reference this poster
+    await client.query('DELETE FROM order_items WHERE poster_id = $1', [id]);
+
+    // Then delete the poster itself
+    const result = await client.query('DELETE FROM posters WHERE id = $1 RETURNING *', [id]);
+
+    if (!result.rows.length) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ message: 'Poster not found' });
+    }
+
+    await client.query('COMMIT'); // Commit transaction
+    res.json({ message: 'Poster deleted successfully', poster: result.rows[0] });
+
+  } catch (err) {
+    await client.query('ROLLBACK'); // Rollback on error
+
+    if (err.code === '23503') { // Foreign key violation
+      res.status(400).json({
+        message: 'Cannot delete poster because it is referenced in existing orders. Please contact system administrator.'
+      });
+    } else {
+      console.error('Error deleting poster:', err);
+      res.status(500).json({ message: 'Server error during poster deletion' });
+    }
+  } finally {
+    client.release();
+  }
+}
+
+export async function deleteCategory(req, res) {
   try {
     const { id } = req.params;
-    const result = await pool.query('DELETE FROM posters WHERE id=$1 RETURNING *', [id]);
-    if (!result.rows.length) return res.status(404).json({ message: 'Poster not found' });
-    res.json({ message: 'Deleted', poster: result.rows[0] });
+    const result = await pool.query('DELETE FROM categories WHERE id=$1 RETURNING *', [id]);
+    if (!result.rows.length) return res.status(404).json({ message: 'Category not found' });
+    res.json({ message: 'Category deleted', category: result.rows[0] });
   }
   catch (err) {
     console.error(err);
@@ -79,16 +141,13 @@ export async function deletePoster(req, res) {
 }
 
 export async function createUserByAdmin(req, res) {
-  // Only admin can call; this will create ordinary users
   try {
     const { username, email, password } = req.body;
     if (!username || !email || !password) return res.status(400).json({ message: 'Missing fields' });
 
-    // check existing
     const existing = await pool.query('SELECT id FROM users WHERE email=$1', [email]);
     if (existing.rows.length) return res.status(400).json({ message: 'Email already used' });
 
-    // hash password
     const bcrypt = await import('bcrypt');
     const hash = await bcrypt.hash(password, 10);
     const result = await pool.query(

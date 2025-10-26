@@ -5,28 +5,54 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="22505b1f-0b62-4af4-b07f-6a7604b5e477" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitIgnore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitIgnore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/Orders.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/Orders.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/CartSidebar.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/CartSidebar.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Hero.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Hero.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ProductCard.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ProductCard.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/Orders.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Orders.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/config/cloudinary.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/config/db.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/config/db.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/AdminCategories.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/AdminCategories.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/AdminCategories.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/AdminCategories.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/AdminOrders.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/AdminOrders.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/AdminOrders.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/AdminOrders.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/AdminPosters.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/AdminPosters.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/AdminPosters.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/AdminPosters.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Hero.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Hero.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Hero.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Hero.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Navbar.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Navbar.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Navbar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/OrderDetailsModal.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/OrderDetailsModal.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/OrderDetailsModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/OrderDetailsModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/ProtectedRoute.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/ProtectedRoute.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/AdminDashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/AdminDashboard.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Cart.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Cart.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Cart.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Cart.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Checkout.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Checkout.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Checkout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Checkout.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Home.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Home.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Home.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Login.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Login.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Orders.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Orders.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/PosterDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/PosterDetail.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Register.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Register.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Shop.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Shop.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/styles/global.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/styles/global.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/controllers/adminController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/adminController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/authController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/authController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/notificationController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/notificationController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/controllers/orderController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/orderController.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/controllers/posterController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/posterController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/middlewares/authMiddleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/middlewares/authMiddleware.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/middlewares/multer.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/middlewares/multer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routes/authRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/authRoutes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routes/notificationRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/notificationRoutes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routes/orderRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/orderRoutes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routes/posterRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/posterRoutes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/adminRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/adminRoutes.js" afterDir="false" />
+    </list>
+    <list id="24ddb208-c7c6-4166-81e8-a32e620e4c17" name="Changes by Moaz" comment="">
+      <change beforePath="$PROJECT_DIR$/client/src/context/AuthContext.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/context/CartContext.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/AdminDashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/AdminDashboard.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/AdminDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/AdminDashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/PosterDetail.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/PosterDetail.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,14 +64,35 @@
       <list>
         <option value="SQL File" />
         <option value="HTML File" />
-        <option value="JSX File" />
-        <option value="CSS File" />
         <option value="JavaScript File" />
+        <option value="CSS File" />
+        <option value="JSX File" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/client/src/pages/AdminDashboard.css">
+      <ranges>
+        <range start1="0" end1="1" start2="0" end2="1" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="2" end1="4" start2="2" end2="2" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="5" end1="7" start2="3" end2="39" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="8" end1="8" start2="40" end2="50" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="10" end1="14" start2="52" end2="57" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="16" end1="17" start2="59" end2="60" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="18" end1="19" start2="61" end2="99" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="20" end1="22" start2="100" end2="210" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="24" end1="26" start2="212" end2="293" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="27" end1="30" start2="294" end2="297" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="31" end1="33" start2="298" end2="300" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="35" end1="36" start2="302" end2="303" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="40" end1="42" start2="307" end2="342" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="44" end1="47" start2="344" end2="375" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
+        <range start1="49" end1="49" start2="377" end2="558" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
+      </ranges>
+    </file>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -75,7 +122,7 @@
     &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;D:\\PyCharm 2024.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\DELL\\AppData\\Roaming\\JetBrains\\PyCharm2025.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -84,6 +131,7 @@
       <recent name="C:\Users\DELL\PycharmProjects\posters" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\DELL\PycharmProjects\posters\client\src\components" />
       <recent name="C:\Users\DELL\PycharmProjects\posters" />
     </key>
   </component>
@@ -102,8 +150,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.26830.99" />
-        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.27397.106" />
+        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
       </set>
     </attachedChunks>
   </component>
@@ -124,7 +172,11 @@
       <workItem from="1761222019638" duration="595000" />
       <workItem from="1761323773936" duration="2370000" />
       <workItem from="1761416362788" duration="3296000" />
-      <workItem from="1761420679318" duration="1440000" />
+      <workItem from="1761420679318" duration="1941000" />
+      <workItem from="1761485382606" duration="2457000" />
+      <workItem from="1761489858808" duration="42000" />
+      <workItem from="1761490973714" duration="3314000" />
+      <workItem from="1761498038099" duration="20700000" />
     </task>
     <servers />
   </component>

@@ -1,13 +1,11 @@
+// PosterDetail.jsx
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import "./PosterDetail.css";
+import { useParams, Link } from "react-router-dom";
 
-const PosterDetail = () => {
+function PosterDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [poster, setPoster] = useState(null);
-  const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchPoster();
@@ -15,54 +13,39 @@ const PosterDetail = () => {
 
   const fetchPoster = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/posters/${id}`);
-      setPoster(res.data);
+      const response = await fetch(`http://localhost:5000/api/posters/${id}`);
+      const data = await response.json();
+      setPoster(data);
     } catch (err) {
-      console.error(err);
+      console.error('Failed to fetch poster:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const addToCart = () => {
-    // Add to cart logic here
-    alert(`Added ${quantity} ${poster.title} to cart`);
-  };
-
-  if (!poster) return <div className="loading">Loading...</div>;
+  if (loading) return <div className="container mt-4">Loading...</div>;
+  if (!poster) return <div className="container mt-4">Poster not found</div>;
 
   return (
-    <div className="poster-detail-page">
-      <button onClick={() => navigate(-1)} className="back-btn">← Back</button>
-
-      <div className="poster-detail">
-        <div className="poster-image">
-          <img src={poster.image_url} alt={poster.title} />
+    <div className="container mt-4">
+      <div className="row">
+        <div className="col-md-6">
+          <img
+            src={poster.image_url}
+            alt={poster.title}
+            className="img-fluid rounded"
+          />
         </div>
-
-        <div className="poster-info">
+        <div className="col-md-6">
           <h1>{poster.title}</h1>
-          {poster.category_name && (
-            <p className="category">{poster.category_name}</p>
-          )}
-          <p className="description">{poster.description}</p>
-          <p className="price">${poster.price}</p>
-
-          <div className="quantity-selector">
-            <label>Quantity:</label>
-            <input
-              type="number"
-              min="1"
-              value={quantity}
-              onChange={(e) => setQuantity(parseInt(e.target.value))}
-            />
-          </div>
-
-          <button onClick={addToCart} className="add-to-cart-btn">
-            Add to Cart - ${(poster.price * quantity).toFixed(2)}
-          </button>
+          <p className="text-muted">{poster.category_name}</p>
+          <p className="fs-3 text-primary">LE {poster.price}</p>
+          <p>{poster.description}</p>
+          <button className="btn btn-primary btn-lg">Add to Cart</button>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default PosterDetail;

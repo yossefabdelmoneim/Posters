@@ -2,11 +2,11 @@
 import express from "express";
 import { authenticateToken, requireAdmin } from "../middlewares/authMiddleware.js";
 import {
-  addCategory,
-  addPoster,
-  editPoster,
-  deletePoster,
-  createUserByAdmin
+    addCategory,
+    addPoster,
+    editPoster,
+    deletePoster,
+    createUserByAdmin, deleteCategory
 } from "../controllers/adminController.js";
 import multer from "multer";
 
@@ -30,7 +30,7 @@ router.post("/category", authenticateToken, requireAdmin, addCategory);
 router.post("/posters", authenticateToken, requireAdmin, upload.single("image"), addPoster);
 router.put("/posters/:id", authenticateToken, requireAdmin, editPoster);
 router.delete("/posters/:id", authenticateToken, requireAdmin, deletePoster);
-
+router.delete("/category/:id", authenticateToken, requireAdmin, deleteCategory);
 // ---- USERS ----
 router.post("/users", authenticateToken, requireAdmin, createUserByAdmin);
 

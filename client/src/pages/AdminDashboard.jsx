@@ -1,45 +1,651 @@
-// src/pages/AdminDashboard.jsx
-import React, { useState } from "react";
-import AdminPosters from "../components/AdminPosters";
-import AdminOrders from "../components/AdminOrders";
-import AdminCategories from "../components/AdminCategories";
-import "./AdminDashboard.css";
+import React, {useState, useEffect} from 'react';
+import {
+    Package,
+    ShoppingCart,
+    Users,
+    Settings,
+    Plus,
+    Edit,
+    Trash2,
+    Upload,
+    Eye,
+    X
+} from 'lucide-react';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState("posters");
+    const [activeTab, setActiveTab] = useState('posters');
+    const [posters, setPosters] = useState([]);
+    const [orders, setOrders] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [editingPoster, setEditingPoster] = useState(null);
+    const [newCategory, setNewCategory] = useState('');
 
-  return (
-    <div className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
+    // Form state
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        price: '',
+        category_id: '',
+        stock: '',
+        image: null
+    });
 
-      <div className="admin-tabs">
-        <button
-          className={activeTab === "posters" ? "active" : ""}
-          onClick={() => setActiveTab("posters")}
-        >
-          Posters
-        </button>
-        <button
-          className={activeTab === "categories" ? "active" : ""}
-          onClick={() => setActiveTab("categories")}
-        >
-          Categories
-        </button>
-        <button
-          className={activeTab === "orders" ? "active" : ""}
-          onClick={() => setActiveTab("orders")}
-        >
-          Orders
-        </button>
-      </div>
+    // Fetch categories on component mount
+    useEffect(() => {
+        fetchCategories();
+    }, []);
 
-      <div className="admin-content">
-        {activeTab === "posters" && <AdminPosters />}
-        {activeTab === "categories" && <AdminCategories />}
-        {activeTab === "orders" && <AdminOrders />}
-      </div>
-    </div>
-  );
+    // Fetch data based on active tab
+    useEffect(() => {
+        fetchData();
+    }, [activeTab]);
+
+    const fetchCategories = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/categories');
+            if (response.ok) {
+                const data = await response.json();
+                setCategories(data);
+            }
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+
+            if (activeTab === 'posters') {
+                const response = await fetch('http://localhost:5000/api/posters');
+                if (response.ok) {
+                    const data = await response.json();
+                    setPosters(data);
+                }
+            } else if (activeTab === 'orders') {
+                const response = await fetch('http://localhost:5000/api/orders', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setOrders(data);
+                }
+            }
+            // Categories are now fetched separately on component mount
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            alert('Error fetching data: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAddPoster = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const token = localStorage.getItem('token');
+            const formDataToSend = new FormData();
+            formDataToSend.append('title', formData.title);
+            formDataToSend.append('description', formData.description);
+            formDataToSend.append('price', parseFloat(formData.price));
+            formDataToSend.append('category_id', formData.category_id || null);
+            formDataToSend.append('stock', parseInt(formData.stock));
+
+            if (formData.image) {
+                formDataToSend.append('image', formData.image);
+            }
+
+            const response = await fetch('http://localhost:5000/api/admin/posters', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formDataToSend
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setShowAddModal(false);
+                setFormData({title: '', description: '', price: '', category_id: '', stock: '', image: null});
+                fetchData(); // Refresh the posters list
+                alert('Poster added successfully!');
+            } else {
+                alert('Error adding poster: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error adding poster:', error);
+            alert('Error adding poster: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleEditPoster = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/admin/posters/${editingPoster.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: formData.title,
+                    description: formData.description,
+                    price: parseFloat(formData.price),
+                    category_id: formData.category_id || null,
+                    stock: parseInt(formData.stock)
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setEditingPoster(null);
+                setFormData({title: '', description: '', price: '', category_id: '', stock: '', image: null});
+                fetchData(); // Refresh the posters list
+                alert('Poster updated successfully!');
+            } else {
+                alert('Error updating poster: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error editing poster:', error);
+            alert('Error editing poster: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeletePoster = async (posterId) => {
+        if (!window.confirm('Are you sure you want to permanently delete this poster? This action cannot be undone.')) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/admin/posters/${posterId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Remove the poster from the local state immediately
+                setPosters(prevPosters => prevPosters.filter(poster => poster.id !== posterId));
+                alert('Poster deleted successfully!');
+            } else {
+                alert('Error deleting poster: ' + result.message);
+
+                // If it's a foreign key error, offer alternative
+                if (result.message.includes('referenced in existing orders')) {
+                    // eslint-disable-next-line no-restricted-globals
+                    if (confirm('This poster is in existing orders. Would you like to hide it by setting stock to 0 instead?')) {
+                        // Call function to set stock to 0
+                        const updateResponse = await fetch(`http://localhost:5000/api/admin/posters/${posterId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({stock: 0})
+                        });
+
+                        if (updateResponse.ok) {
+                            fetchData(); // Refresh data
+                            alert('Poster hidden (stock set to 0)!');
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error deleting poster:', error);
+            alert('Error deleting poster: ' + error.message);
+        }
+    };
+
+    const handleAddCategory = async (e) => {
+        e.preventDefault();
+        if (!newCategory.trim()) {
+            alert('Please enter a category name');
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:5000/api/admin/category', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({name: newCategory})
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                setNewCategory('');
+                setShowCategoryModal(false);
+                fetchCategories(); // Refresh categories list
+                alert('Category added successfully!');
+            } else {
+                alert('Error adding category: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error adding category:', error);
+            alert('Error adding category: ' + error.message);
+        }
+    };
+
+    const handleDeleteCategory = async (categoryId) => {
+        if (!window.confirm('Are you sure you want to delete this category? Posters in this category will have their category set to NULL.')) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/admin/category/${categoryId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                fetchCategories(); // Refresh categories
+                alert('Category deleted successfully!');
+            } else {
+                alert('Error deleting category: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error deleting category:', error);
+            alert('Error deleting category: ' + error.message);
+        }
+    };
+
+    const handleUpdateOrderStatus = async (orderId, newStatus) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({status: newStatus})
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                fetchData();
+                alert('Order status updated successfully!');
+            } else {
+                alert('Error updating order: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error updating order:', error);
+            alert('Error updating order: ' + error.message);
+        }
+    };
+
+    const openEditModal = (poster) => {
+        setEditingPoster(poster);
+        setFormData({
+            title: poster.title,
+            description: poster.description || '',
+            price: poster.price,
+            category_id: poster.category_id || '',
+            stock: poster.stock || 0,
+            image: null
+        });
+    };
+
+    const resetForm = () => {
+        setFormData({title: '', description: '', price: '', category_id: '', stock: '', image: null});
+        setEditingPoster(null);
+        setShowAddModal(false);
+    };
+
+    return (
+        <div className="admin-dashboard">
+            {/* Header */}
+            <div className="admin-header">
+                <div className="admin-header-content">
+                    <h1>FLXR <span className="studios">studios</span> Admin</h1>
+                    <div className="admin-actions">
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => setShowAddModal(true)}
+                        >
+                            <Plus size={16}/>
+                            Add Poster
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="admin-container">
+                {/* Sidebar */}
+                <div className="admin-sidebar">
+                    <nav className="admin-nav">
+                        <button
+                            className={`nav-item ${activeTab === 'posters' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('posters')}
+                        >
+                            <Package size={20}/>
+                            Posters
+                        </button>
+                        <button
+                            className={`nav-item ${activeTab === 'orders' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('orders')}
+                        >
+                            <ShoppingCart size={20}/>
+                            Orders
+                        </button>
+                        <button
+                            className={`nav-item ${activeTab === 'categories' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('categories')}
+                        >
+                            <Users size={20}/>
+                            Categories
+                        </button>
+                    </nav>
+                </div>
+
+                {/* Main Content */}
+                <div className="admin-main">
+                    {loading ? (
+                        <div className="loading">Loading...</div>
+                    ) : (
+                        <>
+                            {/* Posters Management */}
+                            {activeTab === 'posters' && (
+                                <div className="tab-content">
+                                    <div className="section-header">
+                                        <h2>Posters Management</h2>
+                                        <p>Manage your poster collection</p>
+                                    </div>
+
+                                    {posters.length === 0 ? (
+                                        <div className="no-posters">
+                                            <p>No posters found. Add your first poster!</p>
+                                        </div>
+                                    ) : (
+                                        <div className="posters-grid">
+                                            {posters.map(poster => (
+                                                <div key={poster.id} className="poster-card">
+                                                    <div className="poster-image">
+                                                        <img src={poster.image_url} alt={poster.title}/>
+                                                    </div>
+                                                    <div className="poster-info">
+                                                        <h3>{poster.title}</h3>
+                                                        <p className="poster-category">{poster.category_name || 'Uncategorized'}</p>
+                                                        <p className="poster-price">LE {poster.price}</p>
+                                                        <p className="poster-stock">Stock: {poster.stock || 0}</p>
+                                                        {poster.stock === 0 && (
+                                                            <p className="poster-deleted">(Deleted - Stock set to 0)</p>
+                                                        )}
+                                                    </div>
+                                                    <div className="poster-actions">
+                                                        <button
+                                                            className="btn-icon edit"
+                                                            onClick={() => openEditModal(poster)}
+                                                        >
+                                                            <Edit size={16}/>
+                                                        </button>
+                                                        <button
+                                                            className="btn-icon delete"
+                                                            onClick={() => handleDeletePoster(poster.id)}
+                                                        >
+                                                            <Trash2 size={16}/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Orders Management */}
+                            {activeTab === 'orders' && (
+                                <div className="tab-content">
+                                    <div className="section-header">
+                                        <h2>Orders Management</h2>
+                                        <p>View and manage customer orders</p>
+                                    </div>
+
+                                    <div className="orders-table">
+                                        <table>
+                                            <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Customer</th>
+                                                <th>Date</th>
+                                                <th>Total</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {orders.map(order => (
+                                                <tr key={order.id}>
+                                                    <td>#{order.id}</td>
+                                                    <td>{order.username || 'Guest'}</td>
+                                                    <td>{new Date(order.created_at).toLocaleDateString()}</td>
+                                                    <td>LE {order.total}</td>
+                                                    <td>
+                                                        <select
+                                                            value={order.status}
+                                                            onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                                                            className={`status-select ${order.status}`}
+                                                        >
+                                                            <option value="pending">Pending</option>
+                                                            <option value="processing">Processing</option>
+                                                            <option value="shipped">Shipped</option>
+                                                            <option value="delivered">Delivered</option>
+                                                            <option value="cancelled">Cancelled</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <button className="btn-icon view">
+                                                            <Eye size={16}/>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Categories Management */}
+                            {activeTab === 'categories' && (
+                                <div className="tab-content">
+                                    <div className="section-header">
+                                        <h2>Categories Management</h2>
+                                        <p>Manage poster categories</p>
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={() => setShowCategoryModal(true)}
+                                        >
+                                            <Plus size={16}/>
+                                            Add Category
+                                        </button>
+                                    </div>
+
+                                    <div className="categories-grid">
+                                        {categories.map(category => (
+                                            <div key={category.id} className="category-card">
+                                                <h3>{category.name}</h3>
+                                                <div className="category-actions">
+                                                    <button
+                                                        className="btn-icon delete"
+                                                        onClick={() => handleDeleteCategory(category.id)}
+                                                    >
+                                                        <Trash2 size={16}/>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            </div>
+
+            {/* Add/Edit Poster Modal */}
+            {(showAddModal || editingPoster) && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>{editingPoster ? 'Edit Poster' : 'Add New Poster'}</h3>
+                            <button className="close-btn" onClick={resetForm}>
+                                <X size={20}/>
+                            </button>
+                        </div>
+
+                        <form onSubmit={editingPoster ? handleEditPoster : handleAddPoster}>
+                            <div className="form-group">
+                                <label>Title *</label>
+                                <input
+                                    type="text"
+                                    value={formData.title}
+                                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Description</label>
+                                <textarea
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                    rows="3"
+                                />
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Price (LE) *</label>
+                                    <input
+                                        type="number"
+                                        value={formData.price}
+                                        onChange={(e) => setFormData({...formData, price: e.target.value})}
+                                        required
+                                        min="0"
+                                        step="0.01"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Stock *</label>
+                                    <input
+                                        type="number"
+                                        value={formData.stock}
+                                        onChange={(e) => setFormData({...formData, stock: e.target.value})}
+                                        required
+                                        min="0"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Category</label>
+                                <select
+                                    value={formData.category_id}
+                                    onChange={(e) => setFormData({...formData, category_id: e.target.value})}
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.map(category => (
+                                        <option key={category.id} value={category.id}>
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {!editingPoster && (
+                                <div className="form-group">
+                                    <label>Image *</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setFormData({...formData, image: e.target.files[0]})}
+                                        required={!editingPoster}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="modal-actions">
+                                <button type="button" className="btn btn-outline" onClick={resetForm}>
+                                    Cancel
+                                </button>
+                                <button type="submit" className="btn btn-primary" disabled={loading}>
+                                    {loading ? 'Saving...' : (editingPoster ? 'Update Poster' : 'Add Poster')}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Add Category Modal */}
+            {showCategoryModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>Add New Category</h3>
+                            <button className="close-btn" onClick={() => setShowCategoryModal(false)}>
+                                <X size={20}/>
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleAddCategory}>
+                            <div className="form-group">
+                                <label>Category Name *</label>
+                                <input
+                                    type="text"
+                                    value={newCategory}
+                                    onChange={(e) => setNewCategory(e.target.value)}
+                                    required
+                                    placeholder="Enter category name"
+                                />
+                            </div>
+
+                            <div className="modal-actions">
+                                <button type="button" className="btn btn-outline"
+                                        onClick={() => setShowCategoryModal(false)}>
+                                    Cancel
+                                </button>
+                                <button type="submit" className="btn btn-primary">
+                                    Add Category
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 };
 
 export default AdminDashboard;
