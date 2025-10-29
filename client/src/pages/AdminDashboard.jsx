@@ -23,6 +23,68 @@ const AdminDashboard = () => {
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [editingPoster, setEditingPoster] = useState(null);
     const [newCategory, setNewCategory] = useState('');
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [orderItems, setOrderItems] = useState({});
+    const [showOrderModal, setShowOrderModal] = useState(false);
+    const [loadingOrderItems, setLoadingOrderItems] = useState({});
+
+    const fetchOrderItems = async (orderId) => {
+        setLoadingOrderItems(prev => ({...prev, [orderId]: true}));
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/orders/${orderId}/items`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const items = await response.json();
+                setOrderItems(prev => ({...prev, [orderId]: items}));
+            } else {
+                throw new Error('Failed to fetch order items');
+            }
+        } catch (error) {
+            console.error('Error fetching order items:', error);
+            alert('Error loading order details: ' + error.message);
+        } finally {
+            setLoadingOrderItems(prev => ({...prev, [orderId]: false}));
+        }
+    };
+
+    const handleViewOrder = async (order) => {
+        setSelectedOrder(order);
+        setShowOrderModal(true);
+        if (!orderItems[order.id]) {
+            await fetchOrderItems(order.id);
+        }
+    };
+
+    /* Status badge function */
+    const getStatusColor = (status) => {
+        const colors = {
+            'processing': '#3b82f6',
+            'paid': '#10b981',
+            'pending': '#f59e0b',
+            'shipped': '#8b5cf6',
+            'delivered': '#10b981',
+            'cancelled': '#ef4444'
+        };
+        return colors[status] || '#6b7280';
+    };
+
+
+    const getStatusText = (status) => {
+        const texts = {
+            'processing': 'Processing',
+            'paid': 'Paid',
+            'pending': 'Pending',
+            'shipped': 'Shipped',
+            'delivered': 'Delivered',
+            'cancelled': 'Cancelled'
+        };
+        return texts[status] || status;
+    };
 
     // Form state
     const [formData, setFormData] = useState({
@@ -118,7 +180,7 @@ const AdminDashboard = () => {
                 setShowAddModal(false);
                 setFormData({title: '', description: '', price: '', category_id: '', stock: '', image: null});
                 fetchData(); // Refresh the posters list
-                alert('Poster added successfully!');
+                // alert('Poster added successfully!');
             } else {
                 alert('Error adding poster: ' + result.message);
             }
@@ -157,7 +219,7 @@ const AdminDashboard = () => {
                 setEditingPoster(null);
                 setFormData({title: '', description: '', price: '', category_id: '', stock: '', image: null});
                 fetchData(); // Refresh the posters list
-                alert('Poster updated successfully!');
+                // alert('Poster updated successfully!');
             } else {
                 alert('Error updating poster: ' + result.message);
             }
@@ -241,7 +303,7 @@ const AdminDashboard = () => {
                 setNewCategory('');
                 setShowCategoryModal(false);
                 fetchCategories(); // Refresh categories list
-                alert('Category added successfully!');
+                // alert('Category added successfully!');
             } else {
                 alert('Error adding category: ' + result.message);
             }
@@ -344,21 +406,21 @@ const AdminDashboard = () => {
                 <div className="admin-sidebar">
                     <nav className="admin-nav">
                         <button
-                            className={`nav-item ${activeTab === 'posters' ? 'active' : ''}`}
+                            className={`nav-item1 ${activeTab === 'posters' ? 'active' : ''}`}
                             onClick={() => setActiveTab('posters')}
                         >
                             <Package size={20}/>
                             Posters
                         </button>
                         <button
-                            className={`nav-item ${activeTab === 'orders' ? 'active' : ''}`}
+                            className={`nav-item1 ${activeTab === 'orders' ? 'active' : ''}`}
                             onClick={() => setActiveTab('orders')}
                         >
                             <ShoppingCart size={20}/>
                             Orders
                         </button>
                         <button
-                            className={`nav-item ${activeTab === 'categories' ? 'active' : ''}`}
+                            className={`nav-item1 ${activeTab === 'categories' ? 'active' : ''}`}
                             onClick={() => setActiveTab('categories')}
                         >
                             <Users size={20}/>
@@ -389,17 +451,13 @@ const AdminDashboard = () => {
                                         <div className="posters-grid">
                                             {posters.map(poster => (
                                                 <div key={poster.id} className="poster-card">
-                                                    <div className="poster-image">
+                                                    <div className="poster-image1">
                                                         <img src={poster.image_url} alt={poster.title}/>
                                                     </div>
                                                     <div className="poster-info">
                                                         <h3>{poster.title}</h3>
-                                                        <p className="poster-category">{poster.category_name || 'Uncategorized'}</p>
-                                                        <p className="poster-price">LE {poster.price}</p>
-                                                        <p className="poster-stock">Stock: {poster.stock || 0}</p>
-                                                        {poster.stock === 0 && (
-                                                            <p className="poster-deleted">(Deleted - Stock set to 0)</p>
-                                                        )}
+                                                        <p className="poster-category1">{poster.category_name || 'Uncategorized'}</p>
+                                                        <p className="poster-price1">LE {poster.price}</p>
                                                     </div>
                                                     <div className="poster-actions">
                                                         <button
@@ -463,7 +521,10 @@ const AdminDashboard = () => {
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <button className="btn-icon view">
+                                                        <button
+                                                            className="btn-icon view"
+                                                            onClick={() => handleViewOrder(order)}
+                                                        >
                                                             <Eye size={16}/>
                                                         </button>
                                                     </td>
@@ -641,6 +702,82 @@ const AdminDashboard = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* Order Details Modal */}
+            {showOrderModal && selectedOrder && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>Order Details - #{selectedOrder.id}</h3>
+                            <button className="close-btn" onClick={() => setShowOrderModal(false)}>
+                                <X size={20}/>
+                            </button>
+                        </div>
+
+                        <div className="order-modal-content">
+                            <div className="order-summary">
+                                <div className="summary-item">
+                                    <label>Customer:</label>
+                                    <span>{selectedOrder.username || 'Guest'}</span>
+                                </div>
+                                <div className="summary-item">
+                                    <label>Order Date:</label>
+                                    <span>{new Date(selectedOrder.created_at).toLocaleDateString()}</span>
+                                </div>
+                                <div className="summary-item">
+                                    <label>Total Amount:</label>
+                                    <span className="total-amount">LE {selectedOrder.total}</span>
+                                </div>
+                                <div className="summary-item">
+                                    <label>Status:</label>
+                                    <span
+                                        className="status-badge"
+                                        style={{
+                                            backgroundColor: getStatusColor(selectedOrder.status),
+                                            color: 'white',
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '12px'
+                                        }}
+                                    >
+                            {getStatusText(selectedOrder.status)}
+                        </span>
+                                </div>
+                            </div>
+
+                            <div className="order-items-section">
+                                <h4>Order Items</h4>
+                                {loadingOrderItems[selectedOrder.id] ? (
+                                    <div className="loading-items">Loading items...</div>
+                                ) : orderItems[selectedOrder.id] ? (
+                                    <div className="order-items-list">
+                                        {orderItems[selectedOrder.id].map(item => (
+                                            <div key={item.id} className="order-item">
+                                                <img
+                                                    src={item.image_url?.startsWith('http') ? item.image_url : `http://localhost:5000${item.image_url}`}
+                                                    alt={item.poster_title}
+                                                    className="item-image"
+                                                />
+                                                <div className="item-info">
+                                                    <h5>{item.poster_title || 'Unknown Poster'}</h5>
+                                                    <div className="item-details">
+                                                        <span>Quantity: {item.quantity}</span>
+                                                        <span>Price: LE {Number(item.price).toFixed(2)}</span>
+                                                        <span className="item-total">
+                                                Total: LE {(item.quantity * item.price).toFixed(2)}
+                                            </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="no-items">No items found for this order.</div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

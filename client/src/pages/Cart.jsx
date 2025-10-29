@@ -33,14 +33,13 @@ const Cart = () => {
     };
 
     const handleRemoveItem = (itemId, itemName) => {
-        if (window.confirm(`Remove "${itemName}" from your cart?`)) {
             removeFromCart(itemId);
-        }
+
     };
 
     const handleCheckout = () => {
         if (cartItems.length === 0) {
-            alert("Your cart is empty!");
+            // alert("Your cart is empty!");
             return;
         }
         navigate("/checkout");
@@ -54,7 +53,7 @@ const Cart = () => {
                     <div className="empty-cart">
                         <h2>Your cart is empty</h2>
                         <p>Start shopping to add items to your cart</p>
-                        <a href="/" className="shop-btn">Start Shopping</a>
+                        <a href="/shop" className="shop-btn">Start Shopping</a>
                     </div>
                 </div>
             </>

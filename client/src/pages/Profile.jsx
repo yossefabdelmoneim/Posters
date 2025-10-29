@@ -1,303 +1,277 @@
-import React, { useState, useEffect } from 'react';
-import {
-    Package,
-    LogOut
-} from 'lucide-react';
-import './Profile.css';
+import React, { useState, useEffect } from "react";
+import { User, Package, LogOut, AlertCircle, Calendar, Home } from "lucide-react";
+import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
+import "./Profile.css";
 
-const Profile = () => {
-    const [user, setUser] = useState({
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        joinDate: '2024-01-15',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
-    });
-
+function Profile() {
+    const [user, setUser] = useState(null);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [activeTab, setActiveTab] = useState('orders');
+    const navigate = useNavigate();
 
-    const API_BASE_URL = 'http://localhost:3000/api';
-
-    // Fetch user data and orders from backend
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const token = localStorage.getItem('token');
-
-                if (!token) {
-                    window.location.href = '/login';
-                    return;
-                }
-
-                // Fetch user profile
-                const userResponse = await fetch(`${API_BASE_URL}/auth/me`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (userResponse.ok) {
-                    const userData = await userResponse.json();
-                    setUser(userData);
-                }
-
-                // Fetch user orders
-                const ordersResponse = await fetch(`${API_BASE_URL}/orders/my`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (ordersResponse.ok) {
-                    const ordersData = await ordersResponse.json();
-                    setOrders(ordersData);
-                } else {
-                    // Fallback to sample orders
-                    setOrders([
-                        {
-                            id: 'FLXR-123456',
-                            date: '2024-03-15',
-                            total: 750,
-                            status: 'delivered',
-                            items: [
-                                {
-                                    name: 'Urban Legends',
-                                    price: 245,
-                                    quantity: 1,
-                                    image: 'https://images.unsplash.com/photo-1544306094-e2dcf9479da3?w=100&h=100&fit=crop',
-                                    image_url: 'https://images.unsplash.com/photo-1544306094-e2dcf9479da3?w=100&h=100&fit=crop'
-                                },
-                                {
-                                    name: 'Desert Vibes',
-                                    price: 280,
-                                    quantity: 1,
-                                    image: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=100&h=100&fit=crop',
-                                    image_url: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=100&h=100&fit=crop'
-                                }
-                            ]
-                        }
-                    ]);
-                }
-
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                // Use sample data if API fails
-                setOrders([
-                    {
-                        id: 'FLXR-123456',
-                        date: '2024-03-15',
-                        total: 750,
-                        status: 'delivered',
-                        items: [
-                            {
-                                name: 'Urban Legends',
-                                price: 245,
-                                quantity: 1,
-                                image: 'https://images.unsplash.com/photo-1544306094-e2dcf9479da3?w=100&h=100&fit=crop'
-                            }
-                        ]
-                    }
-                ]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUserData();
+        fetchProfileData();
     }, []);
+
+    const fetchProfileData = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/');
+                return;
+            }
+
+            // Fetch user data
+            const userResponse = await fetch('http://localhost:5000/api/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!userResponse.ok) throw new Error('Failed to fetch user data');
+            const userData = await userResponse.json();
+            setUser(userData);
+
+            // Fetch user orders
+            const ordersResponse = await fetch('http://localhost:5000/api/orders/my', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!ordersResponse.ok) throw new Error('Failed to fetch orders');
+            const ordersData = await ordersResponse.json();
+            setOrders(ordersData);
+
+        } catch (err) {
+            console.error('Error fetching profile data:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         window.location.href = '/';
-    };
-
-    // Order functions
-    const viewOrderDetails = async (orderId) => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/orders/${orderId}/items`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                const orderItems = await response.json();
-                // You can display this in a modal or separate page
-                console.log('Order items:', orderItems);
-                alert(`Order ${orderId} details loaded - check console`);
-            }
-        } catch (error) {
-            console.error('Error fetching order details:', error);
-            alert('Error loading order details');
-        }
-    };
-
-    const reorder = async (orderId) => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/orders/${orderId}/reorder`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                alert('Items added to cart successfully!');
-            } else {
-                alert('Reorder feature coming soon!');
-            }
-        } catch (error) {
-            console.error('Error reordering:', error);
-            alert('Reorder feature coming soon!');
-        }
+        window.location.reload();
     };
 
     const getStatusColor = (status) => {
-        switch (status) {
-            case 'delivered': return '#10b981';
-            case 'shipped': return '#3b82f6';
-            case 'processing': return '#f59e0b';
-            case 'cancelled': return '#ef4444';
-            default: return '#6b7280';
-        }
+        const colors = {
+            'pending': '#f59e0b',
+            'processing': '#3b82f6',
+            'paid': '#10b981',
+            'shipped': '#8b5cf6',
+            'delivered': '#10b981',
+            'cancelled': '#ef4444'
+        };
+        return colors[status] || '#6b7280';
     };
 
     const getStatusText = (status) => {
-        switch (status) {
-            case 'delivered': return 'Delivered';
-            case 'shipped': return 'Shipped';
-            case 'processing': return 'Processing';
-            case 'cancelled': return 'Cancelled';
-            default: return 'Pending';
-        }
+        const texts = {
+            'pending': 'Pending',
+            'processing': 'Processing',
+            'paid': 'Paid',
+            'shipped': 'Shipped',
+            'delivered': 'Delivered',
+            'cancelled': 'Cancelled'
+        };
+        return texts[status] || status;
     };
 
     if (loading) {
         return (
-            <div className="profile-loading">
-                <div className="spinner"></div>
-                <p>Loading your orders...</p>
-            </div>
+            <>
+                <Navbar />
+                <div className="profile-loading">
+                    <div className="spinner"></div>
+                    <p>Loading your profile...</p>
+                </div>
+            </>
         );
     }
 
     return (
-        <div className="user-profile">
-            {/* Header */}
-            <div className="profile-header">
-                <div className="container">
-                    <h1>My Account</h1>
-                    <p>Manage your orders and account</p>
-                </div>
-            </div>
-
-            <div className="container">
-                <div className="profile-layout">
-                    {/* Sidebar - Simplified */}
-                    <div className="profile-sidebar">
-                        <div className="sidebar-section">
-                            <div className="user-summary">
-                                <img src={user.avatar} alt={user.name} className="user-avatar" />
-                                <h3>{user.name}</h3>
-                                <p>{user.email}</p>
-                            </div>
-                        </div>
-
-                        <nav className="sidebar-nav">
+        <>
+            <div className="user-dashboard">
+                {/* Header - Matches Admin Dashboard */}
+                <div className="admin-header">
+                    <div className="admin-header-content">
+                        <h1>My <span className="studios">Profile</span></h1>
+                        <div className="admin-actions">
                             <button
-                                className="nav-item active"
+                                className="btn btn-outline-warning"
+                                onClick={() => navigate('/')}
                             >
-                                <Package size={20} />
+                                <Home size={16}/>
+                                Browse Posters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="admin-container">
+                    {/* Sidebar - Matches Admin Dashboard */}
+                    <div className="admin-sidebar">
+                        <nav className="admin-nav">
+                            <button
+                                className={`nav-item2 ${activeTab === 'orders' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('orders')}
+                            >
+                                <Package size={20}/>
                                 My Orders
-                                <span className="badge">{orders.length}</span>
+                                <span className="sidebar-badge">{orders.length}</span>
                             </button>
-                            <div className="nav-divider"></div>
-                            <button className="nav-item logout" onClick={handleLogout}>
-                                <LogOut size={20} />
-                                Sign Out
+                            <button
+                                className={`nav-item2 ${activeTab === 'info' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('info')}
+                            >
+                                <User size={20}/>
+                                Personal Info
                             </button>
+
+                            <div style={{ marginTop: 'auto', padding: '20px 0' }}>
+                                <button
+                                    className="nav-item2 logout"
+                                    onClick={handleLogout}
+                                >
+                                    <LogOut size={20}/>
+                                    Logout
+                                </button>
+                            </div>
                         </nav>
                     </div>
 
-                    {/* Main Content - Only Orders */}
-                    <div className="profile-content">
-                        <div className="tab-content">
-                            <div className="tab-header">
-                                <h2>My Orders</h2>
-                                <p>Track and manage your orders</p>
+                    {/* Main Content - Matches Admin Dashboard */}
+                    <div className="admin-main">
+                        {error && (
+                            <div className="error-message">
+                                <AlertCircle size={20} />
+                                <span>{error}</span>
+                                <button
+                                    onClick={() => setError(null)}
+                                    style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#c33', cursor: 'pointer' }}
+                                >
+                                    ×
+                                </button>
                             </div>
+                        )}
 
-                            {orders.length === 0 ? (
-                                <div className="empty-state">
-                                    <Package size={48} />
-                                    <h3>No orders yet</h3>
-                                    <p>Start shopping to see your orders here</p>
-                                    <a href="/" className="btn btn-primary">Start Shopping</a>
+                        {activeTab === 'orders' && (
+                            <div className="tab-content">
+                                <div className="section-header">
+                                    <h2>My Orders</h2>
+                                    <p>Track and manage your poster orders</p>
                                 </div>
-                            ) : (
-                                <div className="orders-list">
-                                    {orders.map(order => (
-                                        <div key={order.id} className="order-card">
-                                            <div className="order-header">
-                                                <div className="order-info">
-                                                    <h4>Order #{order.id}</h4>
-                                                    <p>Placed on {new Date(order.date).toLocaleDateString()}</p>
-                                                </div>
-                                                <div className="order-status">
-                                                    <span
-                                                        className="status-badge"
-                                                        style={{ backgroundColor: getStatusColor(order.status) }}
-                                                    >
-                                                        {getStatusText(order.status)}
-                                                    </span>
-                                                    <span className="order-total">LE {order.total.toFixed(2)}</span>
-                                                </div>
-                                            </div>
 
-                                            <div className="order-items">
-                                                {order.items && order.items.map((item, index) => (
-                                                    <div key={index} className="order-item">
-                                                        <img src={item.image_url || item.image} alt={item.name} />
-                                                        <div className="item-info">
-                                                            <h5>{item.name}</h5>
-                                                            <p>Quantity: {item.quantity}</p>
-                                                        </div>
-                                                        <span className="item-price">LE {item.price.toFixed(2)}</span>
-                                                    </div>
+                                {orders.length === 0 ? (
+                                    <div className="empty-state">
+                                        <Package size={64} />
+                                        <h3>No orders yet</h3>
+                                        <p>Start shopping to see your orders here</p>
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={() => navigate('/')}
+                                        >
+                                            Browse Posters
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="orders-table">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Order ID</th>
+                                                    <th>Date</th>
+                                                    <th>Total</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {orders.map(order => (
+                                                    <tr key={order.id}>
+                                                        <td>#{order.id}</td>
+                                                        <td>{new Date(order.created_at).toLocaleDateString()}</td>
+                                                        <td>LE {order.total}</td>
+                                                        <td>
+                                                            <span
+                                                                className="status-badge"
+                                                                style={{ backgroundColor: getStatusColor(order.status) }}
+                                                            >
+                                                                {getStatusText(order.status)}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <button
+                                                                className="btn-icon4 view"
+                                                                onClick={() => navigate('/orders')}
+                                                            >
+                                                                View Details
+                                                            </button>
+                                                        </td>
+                                                    </tr>
                                                 ))}
-                                            </div>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
-                                            <div className="order-actions">
-                                                <button
-                                                    className="btn btn-outline"
-                                                    onClick={() => viewOrderDetails(order.id)}
-                                                >
-                                                    View Details
-                                                </button>
-                                                {order.status === 'delivered' && (
-                                                    <button
-                                                        className="btn btn-outline"
-                                                        onClick={() => reorder(order.id)}
-                                                    >
-                                                        Reorder
-                                                    </button>
-                                                )}
-                                                {order.status === 'shipped' && (
-                                                    <button className="btn btn-outline">Track Order</button>
-                                                )}
+                        {activeTab === 'info' && (
+                            <div className="tab-content">
+                                <div className="section-header">
+                                    <h2>Personal Information</h2>
+                                    <p>Manage your account details</p>
+                                </div>
+
+                                <div className="user-info-grid">
+                                    <div className="info-card">
+                                        <div className="info-header">
+                                            <User size={20} />
+                                            <h3>Account Details</h3>
+                                        </div>
+                                        <div className="info-content">
+                                            <div className="info-item">
+                                                <label>Username</label>
+                                                <p>{user?.username}</p>
+                                            </div>
+                                            <div className="info-item">
+                                                <label>Email Address</label>
+                                                <p>{user?.email}</p>
+                                            </div>
+                                            <div className="info-item">
+                                                <label>Account Type</label>
+                                                <p className="role-badge">{user?.role}</p>
+                                            </div>
+                                            <div className="info-item">
+                                                <label>Member Since</label>
+                                                <p>
+                                                    <Calendar size={14} style={{ marginRight: '8px' }} />
+                                                    {new Date(user?.created_at).toLocaleDateString('en-US', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    })}
+                                                </p>
                                             </div>
                                         </div>
-                                    ))}
+                                    </div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
-};
+}
 
 export default Profile;

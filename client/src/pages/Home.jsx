@@ -7,12 +7,14 @@ import {
     HelpCircle, Mail, MessageCircle, MapPin
 } from "lucide-react";
 import { useCart } from "../Context/CartContext";
+import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import Navbar from "../components/Navbar";
 
 const Home = () => {
     const { addToCart, getCartItemsCount } = useCart();
-    const [cartCount, setCartCount] = useState(0);
+    const navigate = useNavigate();
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -59,7 +61,9 @@ const Home = () => {
                     image: poster.image_url || getFallbackImage(poster.id),
                     category_name: poster.category_name,
                     // Generate content for text posters
-                    content: generateTextContent(poster.title, poster.description)
+                    content: generateTextContent(poster.title, poster.description),
+                    // Include original data for product detail page
+                    originalData: poster
                 }));
 
                 console.log('Transformed products:', transformedProducts);
@@ -70,7 +74,7 @@ const Home = () => {
                 console.error('Error fetching data:', err);
                 setError('Failed to load products. Please try again later.');
                 // Fallback to sample data
-                setProducts(getSampleProducts());
+                // setProducts(getSampleProducts());
             } finally {
                 setLoading(false);
             }
@@ -123,63 +127,20 @@ const Home = () => {
         return images[id % images.length];
     };
 
-    // Sample fallback data
-    const getSampleProducts = () => [
-        {
-            id: 1,
-            title: "Minimalist Expression",
-            type: "Modern Black Frame • 30×40 cm",
-            price: 450,
-            isText: true,
-            content: {
-                title: "SIMPLE",
-                subtitle: "BUT MEANINGFUL"
-            },
-            image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 2,
-            title: "Urban Landscape",
-            type: "Gallery Frame • 30×40 cm",
-            price: 520,
-            isText: false,
-            content: {},
-            image: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 3,
-            title: "Abstract Art",
-            type: "Floating Frame • 30×40 cm",
-            price: 480,
-            isText: false,
-            content: {},
-            image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-        },
-        {
-            id: 4,
-            title: "Be Yourself Always",
-            type: "Text Poster • 30×40 cm",
-            price: 390,
-            isText: true,
-            content: {
-                title: "BE YOU",
-                subtitle: "THE WORLD WILL ADJUST"
-            },
-            image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-        }
-    ];
-
-    // Update cart count when cart changes
-    useEffect(() => {
-        setCartCount(getCartItemsCount());
-    }, [getCartItemsCount]);
 
     // Menu functions
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-    const handleAddToCart = (product) => {
+    const handleAddToCart = (product, e) => {
+        e.stopPropagation(); // Prevent navigation when clicking add to cart
         addToCart(product);
-        setCartCount(getCartItemsCount());
+    };
+
+    const handlePosterClick = (poster) => {
+        // Navigate to product detail page
+        navigate(`/poster/${poster.id}`, {
+            state: { poster }
+        });
     };
 
     // Get frame style class based on product
@@ -211,17 +172,16 @@ const Home = () => {
             </div>
 
             {/* Hero Section */}
-            <section className="hero-header">
-                <div className="hero-content">
-                    <div className="container">
-                        <p>Through Bold, Loud Designs!</p>
-                        <h1>Express What Words Can't.</h1>
-                        <div className="hero-buttons">
-                            <a href="#products" className="btn btn-primary">SHOP NOW</a>
-                            <a href="#categories" className="btn btn-outline">EXPLORE COLLECTIONS</a>
-                        </div>
-                    </div>
-                </div>
+            <section
+                className="hero-header"
+                style={{
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/BackGroundImage.jpg")`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                }}
+            >
+                
             </section>
 
             {/* Products Section */}
@@ -257,7 +217,12 @@ const Home = () => {
                     {!loading && !error && products.length > 0 && (
                         <div className="product-grid">
                             {products.map((product, index) => (
-                                <div key={product.id} className="product-card">
+                                <div
+                                    key={product.id}
+                                    className="product-card"
+                                    onClick={() => handlePosterClick(product)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     <div className="product-frame">
                                         <div className={`frame-inner ${getFrameStyle(product, index)}`}>
                                             {product.isText ? (
@@ -290,7 +255,7 @@ const Home = () => {
                                         <p className="product-price">LE {product.price.toFixed(2)}</p>
                                         <button
                                             className="add-to-cart-btn"
-                                            onClick={() => handleAddToCart(product)}
+                                            onClick={(e) => handleAddToCart(product, e)}
                                         >
                                             + Add to Cart
                                         </button>

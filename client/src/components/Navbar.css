@@ -1,127 +1,411 @@
 /* Sticky Navbar Styles */
 .navbar-container {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid #e5e5e5;
-  transition: all 0.3s ease;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e5e5e5;
+    transition: all 0.3s ease;
 }
 
 .navbar-container.scrolled {
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item {
+    background: white !important;
 }
 
 .container {
-  padding: 0 15px;
+    padding: 0 15px;
 }
 
-/* Rest of your existing navbar styles */
+/* Icon styles - FIXED: No background on hover */
 .icon {
-  color: #1a1a1a;
-  transition: color 0.3s ease;
-  width: 20px;
-  height: 20px;
+    color: #1a1a1a;
+    transition: color 0.3s ease;
+    width: 20px;
+    height: 20px;
 }
 
 .icon:hover {
-  color: #ff4500;
+    color: #ff4500;
 }
 
 .studios {
-  color: #e67300;
-  font-weight: bold;
-  padding: 5px;
+    color: #e67300;
+    font-weight: bold;
+    padding: 5px;
 }
 
 .text {
-  font-weight: bold;
+    font-weight: bold;
 }
 
+/* Navigation buttons - FIXED: Remove background */
 .nav-link {
-  transition: all 0.3s ease;
-  border: none !important;
-  background: none !important;
+    transition: color 0.3s ease;
+    border: none !important;
+    background: none !important;
+    padding: 8px;
 }
 
 .nav-link:hover {
-  background-color: #f8f9fa !important;
-  border-radius: 8px;
+    background: none !important;
+    border-radius: 8px;
+}
+
+/* Remove background from nav-pills */
+.nav-pills .nav-link {
+    background: transparent !important;
 }
 
 .nav-pills .nav-link.active {
-  background-color: #e67300 !important;
-  color: white !important;
+    background: transparent !important;
 }
 
+/* Dropdown */
 .dropdown-menu {
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  z-index: 1002;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1002;
 }
 
 .dropdown-item {
-  padding: 8px 16px;
-  transition: all 0.2s ease;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
 }
 
 .dropdown-item:hover {
-  background-color: #f8f9fa;
-  color: #e67300;
+    background-color: #f8f9fa;
+    color: #e67300;
+}
+
+/* Sidebar Styles - FIXED Z-INDEX */
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1100; /* Higher than navbar */
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 350px;
+    height: 100%;
+    background: white;
+    z-index: 1101; /* Higher than backdrop */
+    transition: right 0.3s ease;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.sidebar.open {
+    right: 0;
+}
+
+.sidebar-header {
+    padding: 24px;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.close-sidebar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-sidebar:hover {
+    background: #f5f5f5;
+    color: #1a1a1a;
+}
+
+.sidebar-content {
+    padding: 20px 0;
+}
+
+.sidebar-section {
+    margin-bottom: 30px;
+}
+
+.sidebar-section h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 16px 0;
+    padding: 0 24px;
+}
+
+.categories-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-item {
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 15px;
+    color: #666;
+    text-decoration: none;
+    display: block;
+}
+
+.category-item:hover {
+    background: #f8f9fa;
+    color: #e67300;
+}
+
+.profile-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    text-decoration: none;
+    color: #1a1a1a;
+    transition: all 0.3s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 15px;
+}
+
+.profile-link:hover {
+    background: #f8f9fa;
+    color: #e67300;
+}
+
+/* Search Modal - UPDATED Z-INDEX */
+.search-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1200; /* Higher than sidebar */
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 100px;
+    padding-left: 300px;
+}
+
+.search-modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+.search-header {
+    padding: 24px;
+    border-bottom: 1px solid #f0f0f0;
+    background: white;
+}
+
+.search-body {
+    padding: 0 24px 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+    background: white;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    padding: 8px 0;
+}
+
+.poster-result {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.poster-result:hover {
+    border-color: #ff8000;
+    box-shadow: 0 4px 12px rgba(255, 128, 0, 0.1);
+}
+
+.search-input {
+    width: 100%;
+    padding: 16px 52px 16px 48px;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    font-size: 16px;
+    background: #fafafa;
+    color: #1a1a1a;
+    outline: none;
+}
+
+.search-input:focus {
+    border-color: #ff8000;
+    background: white;
+}
+
+.search-hint {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.search-hint h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.search-hint p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .search-modal {
-    padding-top: 60px;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
+    .search-modal {
+        padding-top: 60px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
 
-  .search-modal-content {
-    width: 95%;
-    max-height: 80vh;
-  }
+    .search-modal-content {
+        width: 95%;
+        max-height: 80vh;
+    }
 
-  .search-header {
-    padding: 16px;
-  }
+    .search-header {
+        padding: 16px;
+    }
 
-  .search-body {
-    padding: 0 16px 16px;
-    max-height: 65vh;
-  }
+    .search-body {
+        padding: 0 16px 16px;
+        max-height: 65vh;
+    }
 
-  .results-grid {
-    grid-template-columns: 1fr;
-  }
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
 
-  .poster-result {
-    padding: 12px;
-  }
+    .poster-result {
+        padding: 12px;
+    }
 
-  .search-input {
-    font-size: 16px;
-  }
+    .search-input {
+        font-size: 16px;
+    }
+
+    .sidebar {
+        width: 300px;
+    }
 }
 
 @media (max-width: 480px) {
-  .search-modal {
-    padding-top: 40px;
-  }
+    .search-modal {
+        padding-top: 40px;
+    }
 
-  .search-hint {
-    padding: 20px;
-  }
+    .search-hint {
+        padding: 20px;
+    }
 
-  .search-hint h3 {
-    font-size: 16px;
-  }
+    .search-hint h3 {
+        font-size: 16px;
+    }
 
-  .search-hint p {
-    font-size: 13px;
-  }
+    .search-hint p {
+        font-size: 13px;
+    }
+
+    .sidebar {
+        width: 280px;
+    }
+}
+
+/* Cart Icon with Badge */
+.cart-icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4500;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    animation: pulse 2s infinite;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Pulse animation for the badge */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Ensure the cart link has proper positioning */
+.nav-link.cart-icon-container {
+    position: relative;
+    padding: 8px;
 }

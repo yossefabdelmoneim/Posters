@@ -104,22 +104,25 @@ body {
     perspective: 1000px;
 }
 
+
 .frame-inner {
     position: relative;
     width: 100%;
     height: 400px;
-    background: #000000; /* Black background for frame */
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     transform-style: preserve-3d;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    /* THIN BLACK FRAME */
-    border: 8px solid #000000;
+    /* REMOVE black background and border - let the image be the background */
+    background: transparent;
+    border: none;
+    /* Add shadow directly to the frame */
     box-shadow:
             0 8px 25px rgba(0, 0, 0, 0.3),
             0 4px 12px rgba(0, 0, 0, 0.2);
+    border-radius: 4px; /* Optional: slight rounding */
 }
 
 .product-card:hover .frame-inner {
@@ -129,13 +132,14 @@ body {
             0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Poster Image - FILLS ENTIRE FRAME */
+/* IMAGE FILLS ENTIRE FRAME */
 .poster-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
+    object-fit: cover; /* This makes the image cover the entire frame */
+    position: absolute; /* Position absolutely to fill the frame */
+    top: 0;
+    left: 0;
     z-index: 1;
 }
 
@@ -354,15 +358,14 @@ button[class*="actions"]:hover {
 
 /* COMBINED HEADER + HERO SECTION */
 .hero-header {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-    url('https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-    background-size: cover;
-    background-position: center;
+    /* Remove all background properties from here */
     color: white;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
+
+
 
 .nav-bar {
     display: flex;

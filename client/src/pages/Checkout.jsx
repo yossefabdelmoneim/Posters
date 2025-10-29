@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Frame } from "lucide-react";
+import { useCart } from "../Context/CartContext";
 import './Checkout.css';
 
 const Checkout = () => {
+    const { cartItems, clearCart, getCartTotal } = useCart();
     const [loading, setLoading] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [orderNumber, setOrderNumber] = useState("");
-    const [cartItems, setCartItems] = useState([]);
     const [formData, setFormData] = useState({
         email: "",
         firstName: "",
@@ -21,55 +22,12 @@ const Checkout = () => {
     });
     const [errors, setErrors] = useState({});
 
-    const API_BASE_URL = 'http://localhost:3000/api';
+    const API_BASE_URL = 'http://localhost:5000/api';
     const SHIPPING_THRESHOLD = 2500;
     const SHIPPING_COST = 50;
 
-    // Fetch cart items from localStorage or context
-    useEffect(() => {
-        const fetchCartItems = () => {
-            try {
-                // Try to get cart from localStorage first
-                const savedCart = localStorage.getItem('cart');
-                if (savedCart) {
-                    const cartData = JSON.parse(savedCart);
-                    setCartItems(cartData);
-                } else {
-                    // Fallback to sample data
-                    setCartItems([
-                        {
-                            id: 1,
-                            name: 'URBAN LEGENDS',
-                            title: 'URBAN LEGENDS',
-                            price: 245,
-                            quantity: 1,
-                            variant: 'Black Frame / 20*30 cm',
-                            image: 'https://images.unsplash.com/photo-1544306094-e2dcf9479da3?w=400&h=500&fit=crop',
-                            image_url: 'https://images.unsplash.com/photo-1544306094-e2dcf9479da3?w=400&h=500&fit=crop'
-                        },
-                        {
-                            id: 2,
-                            name: 'DESERT VIBES',
-                            title: 'DESERT VIBES',
-                            price: 280,
-                            quantity: 2,
-                            variant: 'White Frame / 30*40 cm',
-                            image: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=400&h=500&fit=crop',
-                            image_url: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=400&h=500&fit=crop'
-                        }
-                    ]);
-                }
-            } catch (error) {
-                console.error('Error loading cart:', error);
-                setCartItems([]);
-            }
-        };
-
-        fetchCartItems();
-    }, []);
-
     // Calculate totals
-    const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const subtotal = getCartTotal();
     const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
     const total = subtotal + shipping;
 
@@ -169,36 +127,21 @@ const Checkout = () => {
         setLoading(true);
 
         try {
-            // Get token from localStorage
             const token = localStorage.getItem('token');
 
             if (!token) {
                 alert("Please log in to complete your order");
-                window.location.href = '/login';
+                window.location.href = '/';
                 return;
             }
 
             // Prepare order data for API
             const orderData = {
-                shipping_address: {
-                    first_name: formData.firstName,
-                    last_name: formData.lastName,
-                    email: formData.email,
-                    phone: formData.phone,
-                    address: formData.address,
-                    city: formData.city,
-                    governorate: formData.governorate,
-                    postal_code: formData.postalCode,
-                    notes: formData.notes
-                },
-                payment_method: formData.payment,
                 items: cartItems.map(item => ({
                     poster_id: item.id,
                     quantity: item.quantity,
                     price: item.price
                 })),
-                subtotal: subtotal,
-                shipping_cost: shipping,
                 total: total
             };
 
@@ -222,12 +165,11 @@ const Checkout = () => {
             const orderResponse = await response.json();
 
             // Set order number from response
-            setOrderNumber(orderResponse.order_number || `FLXR-${Date.now().toString().slice(-8)}`);
+            setOrderNumber(orderResponse.orderId || `FLXR-${Date.now().toString().slice(-8)}`);
             setShowSuccessModal(true);
 
             // Clear cart after successful order
-            localStorage.removeItem('cart');
-            setCartItems([]);
+            clearCart();
 
         } catch (err) {
             console.error("Checkout error:", err);
@@ -246,7 +188,6 @@ const Checkout = () => {
 
     const closeModal = () => {
         setShowSuccessModal(false);
-        // Reset form after successful order
         setFormData({
             email: "",
             firstName: "",
@@ -259,9 +200,30 @@ const Checkout = () => {
             notes: "",
             payment: "cod"
         });
-        // Redirect to home
         window.location.href = '/';
     };
+
+    if (cartItems.length === 0 && !showSuccessModal) {
+        return (
+            <div className="checkout-page">
+                <div className="main-header">
+                    <div className="header-content">
+                        <a href="/" className="logo">
+                            <Frame size={24} />
+                            FLXR<span>Studio</span>
+                        </a>
+                    </div>
+                </div>
+                <div className="checkout-container">
+                    <div className="empty-cart">
+                        <h2>Your cart is empty</h2>
+                        <p>Add items to your cart to checkout</p>
+                        <a href="/" className="shop-btn">Start Shopping</a>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="checkout-page">
@@ -277,9 +239,9 @@ const Checkout = () => {
                         <Frame size={24} />
                         FLXR<span>Studio</span>
                     </a>
-                    <a href="/" className="back-to-cart">
+                    <a href="/cart" className="back-to-cart">
                         <ArrowLeft size={16} />
-                        Back to Home
+                        Back to Cart
                     </a>
                 </div>
             </div>
@@ -449,34 +411,6 @@ const Checkout = () => {
                                         <p>Pay with cash when you receive your order</p>
                                     </div>
                                 </label>
-                                <label className={`payment-option ${formData.payment === 'card' ? 'selected' : ''}`}>
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        value="card"
-                                        checked={formData.payment === 'card'}
-                                        onChange={() => selectPayment('card')}
-                                    />
-                                    <span className="payment-icon">💳</span>
-                                    <div className="payment-info">
-                                        <h4>Credit / Debit Card</h4>
-                                        <p>Visa, Mastercard, American Express</p>
-                                    </div>
-                                </label>
-                                <label className={`payment-option ${formData.payment === 'instapay' ? 'selected' : ''}`}>
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        value="instapay"
-                                        checked={formData.payment === 'instapay'}
-                                        onChange={() => selectPayment('instapay')}
-                                    />
-                                    <span className="payment-icon">📱</span>
-                                    <div className="payment-info">
-                                        <h4>InstaPay</h4>
-                                        <p>Instant mobile payment transfer</p>
-                                    </div>
-                                </label>
                             </div>
                         </div>
 
@@ -494,72 +428,62 @@ const Checkout = () => {
                 <div className="order-summary">
                     <div className="order-summary-title">Order Summary</div>
 
-                    {cartItems.length === 0 ? (
-                        <div className="empty-cart-message">
-                            <p>Your cart is empty</p>
-                            <a href="/" className="btn btn-primary">Continue Shopping</a>
+                    {subtotal < SHIPPING_THRESHOLD && subtotal > 0 && (
+                        <div className="shipping-notice">
+                            <span>✓</span>
+                            <span><strong>FREE SHIPPING</strong> on orders over LE 2,500.00</span>
                         </div>
-                    ) : (
-                        <>
-                            {subtotal < SHIPPING_THRESHOLD && subtotal > 0 && (
-                                <div className="shipping-notice">
-                                    <span>✓</span>
-                                    <span><strong>FREE SHIPPING</strong> on orders over LE 2,500.00</span>
-                                </div>
-                            )}
-
-                            <div className="order-items">
-                                {cartItems.map(item => (
-                                    <div key={item.id} className="summary-item">
-                                        <img
-                                            src={item.image_url || item.image}
-                                            alt={item.title || item.name}
-                                            className="summary-item-image"
-                                        />
-                                        <div className="summary-item-info">
-                                            <h4>{item.title || item.name}</h4>
-                                            <p>{item.variant || "Standard"}</p>
-                                            <p className="summary-item-price">{item.quantity} × LE {item.price.toFixed(2)}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="summary-totals">
-                                <div className="summary-row">
-                                    <span>Subtotal</span>
-                                    <span>LE {subtotal.toFixed(2)}</span>
-                                </div>
-                                <div className="summary-row">
-                                    <span>Shipping</span>
-                                    <span>{shipping === 0 ? 'FREE' : `LE ${shipping.toFixed(2)}`}</span>
-                                </div>
-                                <div className="summary-row total">
-                                    <span>Total</span>
-                                    <span className="amount">LE {total.toFixed(2)} EGP</span>
-                                </div>
-                            </div>
-
-                            <button
-                                className="place-order-btn"
-                                onClick={handleSubmit}
-                                disabled={loading || cartItems.length === 0}
-                            >
-                                {loading ? "Processing..." : `Complete Order - LE ${total.toFixed(2)}`}
-                            </button>
-
-                            <div className="security-badges">
-                                <div className="security-badge">
-                                    <span>🔒</span>
-                                    <span>Secure Checkout</span>
-                                </div>
-                                <div className="security-badge">
-                                    <span>✓</span>
-                                    <span>Money Back Guarantee</span>
-                                </div>
-                            </div>
-                        </>
                     )}
+
+                    <div className="order-items">
+                        {cartItems.map(item => (
+                            <div key={item.id} className="summary-item">
+                                <img
+                                    src={item.image_url || item.image}
+                                    alt={item.title || item.name}
+                                    className="summary-item-image"
+                                />
+                                <div className="summary-item-info">
+                                    <h4>{item.title || item.name}</h4>
+                                    <p className="summary-item-price">{item.quantity} × LE {item.price.toFixed(2)}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="summary-totals">
+                        <div className="summary-row">
+                            <span>Subtotal</span>
+                            <span>LE {subtotal.toFixed(2)}</span>
+                        </div>
+                        <div className="summary-row">
+                            <span>Shipping</span>
+                            <span>{shipping === 0 ? 'FREE' : `LE ${shipping.toFixed(2)}`}</span>
+                        </div>
+                        <div className="summary-row total">
+                            <span>Total</span>
+                            <span className="amount">LE {total.toFixed(2)} EGP</span>
+                        </div>
+                    </div>
+
+                    <button
+                        className="place-order-btn"
+                        onClick={handleSubmit}
+                        disabled={loading || cartItems.length === 0}
+                    >
+                        {loading ? "Processing..." : `Complete Order - LE ${total.toFixed(2)}`}
+                    </button>
+
+                    <div className="security-badges">
+                        <div className="security-badge">
+                            <span>🔒</span>
+                            <span>Secure Checkout</span>
+                        </div>
+                        <div className="security-badge">
+                            <span>✓</span>
+                            <span>Money Back Guarantee</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -573,7 +497,7 @@ const Checkout = () => {
                         <p><strong>{formData.email}</strong></p>
                         <div className="order-number">
                             Order Number
-                            <strong>{orderNumber}</strong>
+                            <strong>#{orderNumber}</strong>
                         </div>
                         <p>We'll notify you when your order ships.</p>
                         <button className="modal-btn" onClick={closeModal}>
