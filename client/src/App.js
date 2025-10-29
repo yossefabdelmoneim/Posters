@@ -10,6 +10,8 @@ import {CartProvider} from "./Context/CartContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import CategoryPage from "./components/CategoryPage";
 import RequireAuth from "./components/RequireAuth";
+import PosterDetails from "./components/PosterDetail";
+import ShopPage from "./pages/Shop";
 
 function App() {
     return (
