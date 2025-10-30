@@ -61,9 +61,9 @@ function CategoryPage() {
         quantity: 1
       });
       // Optional: Show feedback to user
-      alert(`${poster.title} added to cart!`);
+      // alert(`${poster.title} added to cart!`);
     } else {
-      alert('This poster is out of stock!');
+      // alert('This poster is out of stock!');
     }
   };
 
@@ -85,30 +85,6 @@ function CategoryPage() {
     <>
       <Navbar />
       <div className="category-dashboard">
-        <div className="admin-header">
-          <div className="admin-header-content">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <button
-                className="btn btn-outline"
-                onClick={() => navigate(-1)}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
-                <ArrowLeft size={16} />
-                Back
-              </button>
-              <h1>{categoryName || `Category ${categoryId}`}</h1>
-            </div>
-            <div className="admin-actions">
-              <button
-                className="btn btn-primary"
-                onClick={() => navigate('/')}
-              >
-                <Home size={16}/>
-                Browse All
-              </button>
-            </div>
-          </div>
-        </div>
 
         <div className="admin-container">
           <div className="admin-sidebar">
@@ -153,22 +129,22 @@ function CategoryPage() {
                   </button>
                 </div>
               ) : (
-                <div className="posters-grid">
+                <div className="posters-grid1">
                   {posters.map(poster => (
-                    <div key={poster.id} className="poster-card">
-                      <div className="poster-image">
+                    <div key={poster.id} className="poster-card1">
+                      <div className="poster-image-category">
                         <img
                           src={poster.image_url}
                           alt={poster.title}
                         />
-                        <div className={`stock-badge ${getStockBadge(poster.stock)}`}>
+                        <div className={`stock-badge1 ${getStockBadge(poster.stock)}`}>
                           {getStockText(poster.stock)}
                         </div>
                       </div>
                       <div className="poster-info">
                         <h3>{poster.title}</h3>
                         <p className="poster-price">LE {poster.price}</p>
-                        <div className="poster-actions">
+                        <div className="poster-actions1">
                           <button
                             className={`btn btn-primary btn-sm ${poster.stock === 0 ? 'disabled' : ''}`}
                             onClick={() => handleAddToCart(poster)}

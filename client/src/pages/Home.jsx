@@ -241,7 +241,7 @@ const Home = () => {
                                                 <img
                                                     src={product.image}
                                                     alt={product.title}
-                                                    className="poster-image"
+                                                    className="poster-image-home"
                                                     onError={(e) => {
                                                         e.target.src = getFallbackImage(product.id);
                                                     }}

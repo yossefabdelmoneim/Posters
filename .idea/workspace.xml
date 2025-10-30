@@ -5,44 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="22505b1f-0b62-4af4-b07f-6a7604b5e477" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/client/src/components/PosterDetail.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/PosterDetail.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/pages/CategoryPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/pages/Orders.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/pages/Orders.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/Context/CartContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/Context/CartContext.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/AdminCategories.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/AdminCategories.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/AdminOrders.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/AdminOrders.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/AdminPosters.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/AdminPosters.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/CategoryPage.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Hero.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Hero.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Navbar.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Navbar.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Navbar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/OrderDetailsModal.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/OrderDetailsModal.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Orders.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Orders.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/AdminDashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/AdminDashboard.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/AdminDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/AdminDashboard.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/Cart.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Cart.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/PosterDetail.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/PosterDetail.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/PosterDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/PosterDetail.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/CategoryPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/CategoryPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/CategoryPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/CategoryPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Checkout.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Checkout.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/pages/Checkout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Checkout.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Home.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/Profile.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Profile.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/Profile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Profile.jsx" afterDir="false" />
-    </list>
-    <list id="24ddb208-c7c6-4166-81e8-a32e620e4c17" name="Changes by Moaz" comment="">
-      <change beforePath="$PROJECT_DIR$/client/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/pages/Home.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Home.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/pages/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Home.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/PosterDetail.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/PosterDetail.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Orders.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Orders.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Shop.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Shop.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Shop.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Shop.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/orderController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/orderController.js" afterDir="false" />
     </list>
+    <list id="24ddb208-c7c6-4166-81e8-a32e620e4c17" name="Changes by Moaz" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -61,32 +39,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/client/src/pages/Home.jsx">
-      <ranges>
-        <range start1="9" end1="9" start2="9" end2="10" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="14" end1="15" start2="15" end2="17" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="61" end1="62" start2="63" end2="66" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="72" end1="73" start2="76" end2="77" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="125" end1="175" start2="129" end2="129" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="179" end1="180" start2="133" end2="135" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="181" end1="182" start2="136" end2="143" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="213" end1="224" start2="174" end2="184" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
-        <range start1="259" end1="260" start2="219" end2="225" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="292" end1="293" start2="257" end2="258" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/client/src/App.js">
-      <ranges>
-        <range start1="4" end1="5" start2="4" end2="4" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="8" end1="8" start2="7" end2="8" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="10" end1="11" start2="10" end2="11" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="20" end1="20" start2="20" end2="21" changelist="24ddb208-c7c6-4166-81e8-a32e620e4c17" />
-        <range start1="21" end1="23" start2="22" end2="22" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-        <range start1="25" end1="28" start2="24" end2="29" changelist="22505b1f-0b62-4af4-b07f-6a7604b5e477" />
-      </ranges>
-    </file>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -178,6 +130,8 @@
       <workItem from="1761559411335" duration="4936000" />
       <workItem from="1761677381709" duration="10695000" />
       <workItem from="1761763379416" duration="2454000" />
+      <workItem from="1761765869682" duration="391000" />
+      <workItem from="1761819589904" duration="7318000" />
     </task>
     <task id="LOCAL-00001" summary="import new pages">
       <option name="closed" value="true" />

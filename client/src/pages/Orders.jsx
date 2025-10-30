@@ -128,7 +128,7 @@ function Orders() {
                         <div className="admin-actions">
                             <button
                                 className="btn btn-outline-warning"
-                                onClick={() => navigate('/')}
+                                onClick={() => navigate('/shop')}
                             >
                                 <Home size={16}/>
                                 Browse Posters

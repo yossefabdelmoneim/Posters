@@ -1,513 +1,293 @@
-import React, { useState, useEffect } from "react";
-import { ArrowLeft, Frame } from "lucide-react";
-import { useCart } from "../Context/CartContext";
+import React, { useState } from 'react';
+import { useCart } from '../Context/CartContext';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, CreditCard, Shield, Truck, Package } from 'lucide-react';
+import Navbar from '../components/Navbar';
 import './Checkout.css';
 
-const Checkout = () => {
-    const { cartItems, clearCart, getCartTotal } = useCart();
-    const [loading, setLoading] = useState(false);
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [orderNumber, setOrderNumber] = useState("");
-    const [formData, setFormData] = useState({
-        email: "",
-        firstName: "",
-        lastName: "",
-        phone: "",
-        address: "",
-        city: "",
-        governorate: "",
-        postalCode: "",
-        notes: "",
-        payment: "cod"
+function Checkout() {
+  const { cartItems, clearCart, getCartTotal } = useCart();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    address: '',
+    city: '',
+    postalCode: '',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: ''
+  });
+
+  const total = getCartTotal();
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     });
-    const [errors, setErrors] = useState({});
+  };
 
-    const API_BASE_URL = 'http://localhost:5000/api';
-    const SHIPPING_THRESHOLD = 2500;
-    const SHIPPING_COST = 50;
+  const handleCheckout = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-    // Calculate totals
-    const subtotal = getCartTotal();
-    const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
-    const total = subtotal + shipping;
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to checkout');
+        navigate('/login');
+        return;
+      }
 
-    // Validation functions
-    const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const isValidPhone = (phone) => phone.replace(/\D/g, '').length >= 10;
+      // Prepare order data
+      const orderData = {
+        items: cartItems.map(item => ({
+          poster_id: item.id,
+          quantity: item.quantity,
+          price: item.price
+        })),
+        total: total
+      };
 
-    const validateField = (name, value) => {
-        let error = "";
+      console.log('Sending order data:', orderData);
 
-        switch (name) {
-            case "email":
-                if (!value.trim()) {
-                    error = "Email is required";
-                } else if (!isValidEmail(value)) {
-                    error = "Please enter a valid email address";
-                }
-                break;
-            case "phone":
-                if (!value.trim()) {
-                    error = "Phone number is required";
-                } else if (!isValidPhone(value)) {
-                    error = "Please enter a valid phone number";
-                }
-                break;
-            case "firstName":
-            case "lastName":
-            case "address":
-            case "city":
-                if (!value.trim()) error = "This field is required";
-                break;
-            case "governorate":
-                if (!value) error = "Please select a governorate";
-                break;
-            default:
-                break;
-        }
+      const response = await fetch('http://localhost:5000/api/orders', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+      });
 
-        return error;
-    };
+      const result = await response.json();
+      console.log('Order response:', result);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ""
-            }));
-        }
-    };
-
-    const handleBlur = (e) => {
-        const { name, value } = e.target;
-        const error = validateField(name, value);
-        setErrors(prev => ({
-            ...prev,
-            [name]: error
-        }));
-    };
-
-    const validateForm = () => {
-        const newErrors = {};
-
-        Object.keys(formData).forEach(key => {
-            if (key !== "postalCode" && key !== "notes") {
-                const error = validateField(key, formData[key]);
-                if (error) newErrors[key] = error;
-            }
-        });
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!validateForm()) {
-            const firstErrorField = document.querySelector('.input-error');
-            if (firstErrorField) {
-                firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                firstErrorField.focus();
-            }
-            return;
-        }
-
-        if (cartItems.length === 0) {
-            alert("Your cart is empty. Please add items to your cart before checking out.");
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            const token = localStorage.getItem('token');
-
-            if (!token) {
-                alert("Please log in to complete your order");
-                window.location.href = '/';
-                return;
-            }
-
-            // Prepare order data for API
-            const orderData = {
-                items: cartItems.map(item => ({
-                    poster_id: item.id,
-                    quantity: item.quantity,
-                    price: item.price
-                })),
-                total: total
-            };
-
-            console.log('Sending order data:', orderData);
-
-            // Send order to backend
-            const response = await fetch(`${API_BASE_URL}/orders`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(orderData)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to create order');
-            }
-
-            const orderResponse = await response.json();
-
-            // Set order number from response
-            setOrderNumber(orderResponse.orderId || `FLXR-${Date.now().toString().slice(-8)}`);
-            setShowSuccessModal(true);
-
-            // Clear cart after successful order
-            clearCart();
-
-        } catch (err) {
-            console.error("Checkout error:", err);
-            alert(err.message || "Checkout failed. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const selectPayment = (method) => {
-        setFormData(prev => ({
-            ...prev,
-            payment: method
-        }));
-    };
-
-    const closeModal = () => {
-        setShowSuccessModal(false);
-        setFormData({
-            email: "",
-            firstName: "",
-            lastName: "",
-            phone: "",
-            address: "",
-            city: "",
-            governorate: "",
-            postalCode: "",
-            notes: "",
-            payment: "cod"
-        });
-        window.location.href = '/';
-    };
-
-    if (cartItems.length === 0 && !showSuccessModal) {
-        return (
-            <div className="checkout-page">
-                <div className="main-header">
-                    <div className="header-content">
-                        <a href="/" className="logo">
-                            <Frame size={24} />
-                            FLXR<span>Studio</span>
-                        </a>
-                    </div>
-                </div>
-                <div className="checkout-container">
-                    <div className="empty-cart">
-                        <h2>Your cart is empty</h2>
-                        <p>Add items to your cart to checkout</p>
-                        <a href="/" className="shop-btn">Start Shopping</a>
-                    </div>
-                </div>
-            </div>
-        );
+      if (response.ok && result.success) {
+        // SUCCESS: Only clear cart after successful order
+        clearCart();
+        alert('Order placed successfully!');
+        navigate('/orders');
+      } else {
+        // FAILURE: Don't clear cart, show error
+        alert(`Order failed: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Checkout failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
+  };
 
+  if (cartItems.length === 0) {
     return (
-        <div className="checkout-page">
-            {/* Marquee Banner */}
-            <div className="marquee">
-                <span>SHIPPING ALL OVER EGYPT • FREE SHIPPING ABOVE 2500 EGP • LIMITED EDITION DESIGNS AVAILABLE NOW</span>
-            </div>
-
-            {/* Main Header */}
-            <div className="main-header">
-                <div className="header-content">
-                    <a href="/" className="logo">
-                        <Frame size={24} />
-                        FLXR<span>Studio</span>
-                    </a>
-                    <a href="/cart" className="back-to-cart">
-                        <ArrowLeft size={16} />
-                        Back to Cart
-                    </a>
-                </div>
-            </div>
-
-            <div className="checkout-container">
-                {/* Checkout Form */}
-                <div className="checkout-form">
-                    <h1 className="page-title">Checkout</h1>
-
-                    <form onSubmit={handleSubmit}>
-                        {/* Contact Information */}
-                        <div className="section">
-                            <div className="section-title">Contact Information</div>
-                            <div className="form-group">
-                                <label>Email Address <span className="required">*</span></label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                    onBlur={handleBlur}
-                                    placeholder="you@example.com"
-                                    className={errors.email ? "input-error" : ""}
-                                    required
-                                />
-                                {errors.email && <span className="error-message">{errors.email}</span>}
-                            </div>
-
-                            <div className="form-group">
-                                <label>Phone Number <span className="required">*</span></label>
-                                <input
-                                    type="tel"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleInputChange}
-                                    onBlur={handleBlur}
-                                    placeholder="+20 123 456 7890"
-                                    className={errors.phone ? "input-error" : ""}
-                                    required
-                                />
-                                {errors.phone && <span className="error-message">{errors.phone}</span>}
-                            </div>
-                        </div>
-
-                        {/* Shipping Address */}
-                        <div className="section">
-                            <div className="section-title">Shipping Address</div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>First Name <span className="required">*</span></label>
-                                    <input
-                                        type="text"
-                                        name="firstName"
-                                        value={formData.firstName}
-                                        onChange={handleInputChange}
-                                        onBlur={handleBlur}
-                                        className={errors.firstName ? "input-error" : ""}
-                                        required
-                                    />
-                                    {errors.firstName && <span className="error-message">{errors.firstName}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Last Name <span className="required">*</span></label>
-                                    <input
-                                        type="text"
-                                        name="lastName"
-                                        value={formData.lastName}
-                                        onChange={handleInputChange}
-                                        onBlur={handleBlur}
-                                        className={errors.lastName ? "input-error" : ""}
-                                        required
-                                    />
-                                    {errors.lastName && <span className="error-message">{errors.lastName}</span>}
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Street Address <span className="required">*</span></label>
-                                <input
-                                    type="text"
-                                    name="address"
-                                    value={formData.address}
-                                    onChange={handleInputChange}
-                                    onBlur={handleBlur}
-                                    placeholder="Street address, building number, floor"
-                                    className={errors.address ? "input-error" : ""}
-                                    required
-                                />
-                                {errors.address && <span className="error-message">{errors.address}</span>}
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>City <span className="required">*</span></label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        value={formData.city}
-                                        onChange={handleInputChange}
-                                        onBlur={handleBlur}
-                                        className={errors.city ? "input-error" : ""}
-                                        required
-                                    />
-                                    {errors.city && <span className="error-message">{errors.city}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Governorate <span className="required">*</span></label>
-                                    <select
-                                        name="governorate"
-                                        value={formData.governorate}
-                                        onChange={handleInputChange}
-                                        onBlur={handleBlur}
-                                        className={errors.governorate ? "input-error" : ""}
-                                        required
-                                    >
-                                        <option value="">Select Governorate</option>
-                                        <option value="Cairo">Cairo</option>
-                                        <option value="Giza">Giza</option>
-                                        <option value="Alexandria">Alexandria</option>
-                                        <option value="Qalyubia">Qalyubia</option>
-                                        <option value="Sharqia">Sharqia</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                    {errors.governorate && <span className="error-message">{errors.governorate}</span>}
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Postal Code (Optional)</label>
-                                <input
-                                    type="text"
-                                    name="postalCode"
-                                    value={formData.postalCode}
-                                    onChange={handleInputChange}
-                                    placeholder="12345"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Additional Notes (Optional)</label>
-                                <textarea
-                                    name="notes"
-                                    value={formData.notes}
-                                    onChange={handleInputChange}
-                                    rows="3"
-                                    placeholder="Special delivery instructions, apartment details, etc."
-                                />
-                            </div>
-                        </div>
-
-                        {/* Payment Method */}
-                        <div className="section">
-                            <div className="section-title">Payment Method</div>
-                            <div className="payment-methods">
-                                <label className={`payment-option ${formData.payment === 'cod' ? 'selected' : ''}`}>
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        value="cod"
-                                        checked={formData.payment === 'cod'}
-                                        onChange={() => selectPayment('cod')}
-                                    />
-                                    <span className="payment-icon">💵</span>
-                                    <div className="payment-info">
-                                        <h4>Cash on Delivery</h4>
-                                        <p>Pay with cash when you receive your order</p>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="place-order-btn mobile-only"
-                            disabled={loading || cartItems.length === 0}
-                        >
-                            {loading ? "Processing..." : `Complete Order - LE ${total.toFixed(2)}`}
-                        </button>
-                    </form>
-                </div>
-
-                {/* Order Summary */}
-                <div className="order-summary">
-                    <div className="order-summary-title">Order Summary</div>
-
-                    {subtotal < SHIPPING_THRESHOLD && subtotal > 0 && (
-                        <div className="shipping-notice">
-                            <span>✓</span>
-                            <span><strong>FREE SHIPPING</strong> on orders over LE 2,500.00</span>
-                        </div>
-                    )}
-
-                    <div className="order-items">
-                        {cartItems.map(item => (
-                            <div key={item.id} className="summary-item">
-                                <img
-                                    src={item.image_url || item.image}
-                                    alt={item.title || item.name}
-                                    className="summary-item-image"
-                                />
-                                <div className="summary-item-info">
-                                    <h4>{item.title || item.name}</h4>
-                                    <p className="summary-item-price">{item.quantity} × LE {item.price.toFixed(2)}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="summary-totals">
-                        <div className="summary-row">
-                            <span>Subtotal</span>
-                            <span>LE {subtotal.toFixed(2)}</span>
-                        </div>
-                        <div className="summary-row">
-                            <span>Shipping</span>
-                            <span>{shipping === 0 ? 'FREE' : `LE ${shipping.toFixed(2)}`}</span>
-                        </div>
-                        <div className="summary-row total">
-                            <span>Total</span>
-                            <span className="amount">LE {total.toFixed(2)} EGP</span>
-                        </div>
-                    </div>
-
-                    <button
-                        className="place-order-btn"
-                        onClick={handleSubmit}
-                        disabled={loading || cartItems.length === 0}
-                    >
-                        {loading ? "Processing..." : `Complete Order - LE ${total.toFixed(2)}`}
-                    </button>
-
-                    <div className="security-badges">
-                        <div className="security-badge">
-                            <span>🔒</span>
-                            <span>Secure Checkout</span>
-                        </div>
-                        <div className="security-badge">
-                            <span>✓</span>
-                            <span>Money Back Guarantee</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Success Modal */}
-            {showSuccessModal && (
-                <div className="modal active">
-                    <div className="modal-content">
-                        <div className="success-icon">✓</div>
-                        <h2>Order Confirmed!</h2>
-                        <p>Thank you for your purchase. A confirmation email has been sent to:</p>
-                        <p><strong>{formData.email}</strong></p>
-                        <div className="order-number">
-                            Order Number
-                            <strong>#{orderNumber}</strong>
-                        </div>
-                        <p>We'll notify you when your order ships.</p>
-                        <button className="modal-btn" onClick={closeModal}>
-                            Continue Shopping
-                        </button>
-                    </div>
-                </div>
-            )}
+      <>
+        <Navbar />
+        <div className="checkout-empty">
+          <div className="empty-cart-message">
+            <Package size={64} />
+            <h2>Your cart is empty</h2>
+            <p>Add some posters before checking out</p>
+            <button
+              onClick={() => navigate('/shop')}
+              className="btn btn-primary"
+            >
+              Browse Posters
+            </button>
+          </div>
         </div>
+      </>
     );
-};
+  }
+
+  return (
+    <>
+      <Navbar />
+      <div className="checkout-page">
+        <div className="checkout-container">
+          <button
+            onClick={() => navigate('/cart')}
+            className="back-btn"
+          >
+            <ArrowLeft size={20} />
+            Back to Cart
+          </button>
+
+          <div className="checkout-layout">
+            <div className="checkout-form-section">
+              <h1>Checkout</h1>
+
+              <form onSubmit={handleCheckout} className="checkout-form">
+                {/* Shipping Information */}
+                <div className="form-section">
+                  <h3>
+                    <Truck size={20} />
+                    Shipping Information
+                  </h3>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Full Name *</label>
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Email *</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Address *</label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>City *</label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Postal Code *</label>
+                      <input
+                        type="text"
+                        name="postalCode"
+                        value={formData.postalCode}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payment Information */}
+                <div className="form-section">
+                  <h3>
+                    <CreditCard size={20} />
+                    Payment Information
+                  </h3>
+                  <div className="form-group">
+                    <label>Card Number *</label>
+                    <input
+                      type="text"
+                      name="cardNumber"
+                      placeholder="1234 5678 9012 3456"
+                      value={formData.cardNumber}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Expiry Date *</label>
+                      <input
+                        type="text"
+                        name="expiryDate"
+                        placeholder="MM/YY"
+                        value={formData.expiryDate}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>CVV *</label>
+                      <input
+                        type="text"
+                        name="cvv"
+                        placeholder="123"
+                        value={formData.cvv}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="checkout-btn"
+                  disabled={loading}
+                >
+                  {loading ? 'Processing...' : `Pay LE ${total.toFixed(2)}`}
+                </button>
+              </form>
+            </div>
+
+            {/* Order Summary Section - SIMPLIFIED */}
+            <div className="order-summary-section">
+              <div className="order-summary">
+                <div className="summary-header">
+                  <h3>Order Summary</h3>
+                  <span className="items-count">{cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}</span>
+                </div>
+
+                <div className="order-items">
+                  {cartItems.map(item => (
+                    <div key={item.id} className="order-item">
+                      <img src={item.image_url} alt={item.title} className="item-image" />
+                      <div className="item-details">
+                        <h4 className="item-title">{item.title}</h4>
+                        <div className="item-info">
+                          <span className="item-quantity">Qty: {item.quantity}</span>
+                          <span className="item-price">LE {item.price} each</span>
+                        </div>
+                      </div>
+                      <div className="item-total">
+                        LE {(item.quantity * item.price).toFixed(2)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="order-totals">
+                  <div className="total-row">
+                    <span>Subtotal</span>
+                    <span>LE {total.toFixed(2)}</span>
+                  </div>
+                  <div className="total-row">
+                    <span>Shipping</span>
+                    <span className="free-shipping">FREE</span>
+                  </div>
+                  <div className="total-row grand-total">
+                    <span>Total</span>
+                    <span>LE {total.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <div className="security-badge">
+                  <Shield size={18} />
+                  <span>Secure checkout</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
 
 export default Checkout;
