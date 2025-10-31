@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../Context/CartContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Shield, Truck, Package } from 'lucide-react';
+import { ArrowLeft, Truck, Package, MapPin, Phone } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import './Checkout.css';
 
@@ -9,24 +9,33 @@ function Checkout() {
   const { cartItems, clearCart, getCartTotal } = useCart();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showGovernoratePopup, setShowGovernoratePopup] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    mobile: '',
     address: '',
-    city: '',
-    postalCode: '',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: ''
+    governorate: '',
+    city: ''
   });
+
+  const egyptGovernorates = [
+    'Cairo', 'Alexandria', 'Giza', 'Qalyubia', 'Port Said', 'Suez',
+    'Dakahlia', 'Sharqia', 'Monufia', 'Gharbia', 'Beheira', 'Ismailia',
+    'Faiyum', 'Beni Suef', 'Minya', 'Asyut', 'Sohag', 'Qena',
+    'Luxor', 'Aswan', 'Red Sea', 'New Valley', 'Matrouh',
+    'North Sinai', 'South Sinai', 'Damietta', 'Kafr El Sheikh'
+  ].sort();
 
   const total = getCartTotal();
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleGovernorateSelect = (governorate) => {
+    setFormData({ ...formData, governorate });
+    setShowGovernoratePopup(false);
   };
 
   const handleCheckout = async (e) => {
@@ -41,17 +50,18 @@ function Checkout() {
         return;
       }
 
-      // Prepare order data
       const orderData = {
         items: cartItems.map(item => ({
           poster_id: item.id,
           quantity: item.quantity,
-          price: item.price
+          price: item.price,
+          style: item.style,
+          size: item.size
         })),
-        total: total
+        total,
+        shipping_info: formData,
+        payment_method: 'cash'
       };
-
-      console.log('Sending order data:', orderData);
 
       const response = await fetch('http://localhost:5000/api/orders', {
         method: 'POST',
@@ -63,15 +73,12 @@ function Checkout() {
       });
 
       const result = await response.json();
-      console.log('Order response:', result);
 
       if (response.ok && result.success) {
-        // SUCCESS: Only clear cart after successful order
         clearCart();
-        alert('Order placed successfully!');
+        alert('Order placed successfully! You will pay cash on delivery.');
         navigate('/orders');
       } else {
-        // FAILURE: Don't clear cart, show error
         alert(`Order failed: ${result.message}`);
       }
     } catch (error) {
@@ -86,15 +93,12 @@ function Checkout() {
     return (
       <>
         <Navbar />
-        <div className="checkout-empty">
-          <div className="empty-cart-message">
+        <div className="co-empty">
+          <div className="co-empty-card">
             <Package size={64} />
             <h2>Your cart is empty</h2>
             <p>Add some posters before checking out</p>
-            <button
-              onClick={() => navigate('/shop')}
-              className="btn btn-primary"
-            >
+            <button onClick={() => navigate('/shop')} className="co-btn co-btn-primary">
               Browse Posters
             </button>
           </div>
@@ -106,185 +110,202 @@ function Checkout() {
   return (
     <>
       <Navbar />
-      <div className="checkout-page">
-        <div className="checkout-container">
-          <button
-            onClick={() => navigate('/cart')}
-            className="back-btn"
-          >
+      <div className="co-page">
+        <div className="co-container">
+          <button onClick={() => navigate('/cart')} className="co-back-btn">
             <ArrowLeft size={20} />
             Back to Cart
           </button>
 
-          <div className="checkout-layout">
-            <div className="checkout-form-section">
+          <div className="co-layout">
+            {/* Form Section */}
+            <div className="co-form-wrapper">
               <h1>Checkout</h1>
 
-              <form onSubmit={handleCheckout} className="checkout-form">
-                {/* Shipping Information */}
-                <div className="form-section">
+              <form onSubmit={handleCheckout} className="co-form">
+                <div className="co-section">
                   <h3>
                     <Truck size={20} />
                     Shipping Information
                   </h3>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Full Name *</label>
-                      <input
-                        type="text"
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Email *</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label>Address *</label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>City *</label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Postal Code *</label>
-                      <input
-                        type="text"
-                        name="postalCode"
-                        value={formData.postalCode}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
 
-                {/* Payment Information */}
-                <div className="form-section">
-                  <h3>
-                    <CreditCard size={20} />
-                    Payment Information
-                  </h3>
-                  <div className="form-group">
-                    <label>Card Number *</label>
-                    <input
-                      type="text"
-                      name="cardNumber"
-                      placeholder="1234 5678 9012 3456"
-                      value={formData.cardNumber}
-                      onChange={handleInputChange}
-                      required
-                    />
+                  <div className="co-row">
+                    <div className="co-group">
+                      <label>Full Name *</label>
+                      <input type="text" name="fullName" value={formData.fullName} onChange={handleInputChange} required />
+                    </div>
+                    <div className="co-group">
+                      <label>Email *</label>
+                      <input type="email" name="email" value={formData.email} onChange={handleInputChange} required />
+                    </div>
                   </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Expiry Date *</label>
+
+                  <div className="co-row">
+                    <div className="co-group">
+                      <label>Mobile Number *</label>
+                      <div className="co-input-icon">
+                        <Phone size={18} className="co-icon" />
+                        <input
+                          type="tel"
+                          name="mobile"
+                          placeholder="01XXXXXXXXX"
+                          value={formData.mobile}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="co-group">
+                      <label>Governorate *</label>
+                      <div
+                        className="co-select"
+                        onClick={() => setShowGovernoratePopup(true)}
+                      >
+                        <input
+                          type="text"
+                          name="governorate"
+                          value={formData.governorate}
+                          placeholder="Select Governorate"
+                          readOnly
+                          required
+                        />
+                        <MapPin size={18} className="co-select-icon" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="co-group">
+                    <label>Address *</label>
+                    <div className="co-input-icon">
+                      <MapPin size={18} className="co-icon" />
                       <input
                         type="text"
-                        name="expiryDate"
-                        placeholder="MM/YY"
-                        value={formData.expiryDate}
+                        name="address"
+                        placeholder="Street address, building, apartment, etc."
+                        value={formData.address}
                         onChange={handleInputChange}
                         required
                       />
                     </div>
-                    <div className="form-group">
-                      <label>CVV *</label>
-                      <input
-                        type="text"
-                        name="cvv"
-                        placeholder="123"
-                        value={formData.cvv}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
+                  </div>
+
+                  <div className="co-group">
+                    <label>City *</label>
+                    <input type="text" name="city" value={formData.city} onChange={handleInputChange} required />
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="checkout-btn"
-                  disabled={loading}
+                  className="co-submit-btn"
+                  disabled={loading || !formData.governorate}
                 >
-                  {loading ? 'Processing...' : `Pay LE ${total.toFixed(2)}`}
+                  {loading ? (
+                    <>
+                      <div className="co-spinner"></div> Processing...
+                    </>
+                  ) : (
+                    `Place Order - LE ${total.toFixed(2)}`
+                  )}
                 </button>
               </form>
             </div>
 
-            {/* Order Summary Section - SIMPLIFIED */}
-            <div className="order-summary-section">
-              <div className="order-summary">
-                <div className="summary-header">
+            {/* Order Summary */}
+            <div className="co-summary-wrapper">
+              <div className="co-summary">
+                <div className="co-summary-header">
                   <h3>Order Summary</h3>
-                  <span className="items-count">{cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}</span>
+                  <span className="co-items-badge">{cartItems.length} items</span>
                 </div>
 
-                <div className="order-items">
+                <div className="co-items">
                   {cartItems.map(item => (
-                    <div key={item.id} className="order-item">
-                      <img src={item.image_url} alt={item.title} className="item-image" />
-                      <div className="item-details">
-                        <h4 className="item-title">{item.title}</h4>
-                        <div className="item-info">
-                          <span className="item-quantity">Qty: {item.quantity}</span>
-                          <span className="item-price">LE {item.price} each</span>
+                    <div key={item.id} className="co-item">
+                      <img src={item.image_url} alt={item.title} className="co-item-img" />
+                      <div className="co-item-info">
+                        <h4 className="co-item-title">{item.title}</h4>
+                        <div className="co-item-specs">
+                          <span className="co-spec">{item.style}</span>
+                          <span className="co-spec">{item.size}</span>
+                        </div>
+                        <div className="co-item-meta">
+                          <span className="co-qty">Qty: {item.quantity}</span>
+                          <span className="co-price">LE {item.price} each</span>
                         </div>
                       </div>
-                      <div className="item-total">
+                      <div className="co-item-total">
                         LE {(item.quantity * item.price).toFixed(2)}
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="order-totals">
-                  <div className="total-row">
+                <div className="co-totals">
+                  <div className="co-total-row">
                     <span>Subtotal</span>
                     <span>LE {total.toFixed(2)}</span>
                   </div>
-                  <div className="total-row">
+                  <div className="co-total-row">
                     <span>Shipping</span>
-                    <span className="free-shipping">FREE</span>
+                    <span className="co-free">FREE</span>
                   </div>
-                  <div className="total-row grand-total">
+                  <div className="co-total-row co-grand-total">
                     <span>Total</span>
                     <span>LE {total.toFixed(2)}</span>
                   </div>
                 </div>
 
-                <div className="security-badge">
-                  <Shield size={18} />
-                  <span>Secure checkout</span>
+                <div className="co-delivery">
+                  <div className="co-delivery-estimate">
+                    <Truck size={18} />
+                    Estimated delivery: 3-5 business days
+                  </div>
+                  <p className="co-shipping-note">Free standard shipping across Egypt</p>
+                </div>
+
+                <div className="co-payment-note">
+                  <p>Cash on Delivery - Pay when you receive your order</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Governorate Popup */}
+        {showGovernoratePopup && (
+          <div className="co-overlay" onClick={() => setShowGovernoratePopup(false)}>
+            <div className="co-popup" onClick={(e) => e.stopPropagation()}>
+              <div className="co-popup-header">
+                <h3>Select Governorate</h3>
+                <button className="co-popup-close" onClick={() => setShowGovernoratePopup(false)}>
+                  ×
+                </button>
+              </div>
+              <div className="co-popup-body">
+                <div className="co-search">
+                  <input
+                    type="text"
+                    placeholder="Search governorate..."
+                    className="co-search-input"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+                <div className="co-list">
+                  {egyptGovernorates.map((gov) => (
+                    <button
+                      key={gov}
+                      className={`co-option ${formData.governorate === gov ? 'co-selected' : ''}`}
+                      onClick={() => handleGovernorateSelect(gov)}
+                    >
+                      {gov}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

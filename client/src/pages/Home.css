@@ -1,80 +1,29 @@
 /* src/pages/Home.css */
 
-/* Reset and Base Styles */
-* {
+/* Home Page Specific Styles */
+.home-page {
+    background-color: #f8f9fa;
+}
+
+.home-page * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body {
-    background-color: #f8f9fa;
-    color: #333;
-    line-height: 1.6;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-}
-
-/* Common Button Styles */
-.btn {
-    display: inline-block;
-    padding: 12px 24px;
-    border-radius: 50px;
-    font-weight: 700;
-    text-decoration: none;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-    font-family: inherit;
-}
-
-.btn-primary {
-    background: white;
-    color: #222;
-}
-
-.btn-primary:hover {
-    background: #ff8000;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 128, 0, 0.3);
-}
-
-.btn-secondary {
-    background: #ff8000;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #e67300;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 128, 0, 0.3);
-}
-
-.btn-outline {
-    background: transparent;
-    color: white;
-    border: 2px solid #ff8000;
-}
-
-.btn-outline:hover {
-    background: #ff8000;
-    color: white;
-}
-
-/* Container */
-.container {
+/* Home Container */
+.home-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* Section Spacing */
-.section {
+/* Home Section Spacing */
+.home-section {
     padding: 80px 0;
 }
 
-.section-title {
+.home-section-title {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 50px;
@@ -82,7 +31,7 @@ body {
     font-weight: 900;
 }
 
-.section-title::after {
+.home-section-title::after {
     content: '';
     display: block;
     width: 80px;
@@ -92,8 +41,87 @@ body {
     border-radius: 2px;
 }
 
-/* Enhanced Product Frame Styles - THIN FRAME, FULL IMAGE */
-.product-frame {
+/* Home Marquee */
+.home-marquee {
+    background: linear-gradient(90deg, #ff8000, #ffa94d, #ff8000);
+    color: white;
+    padding: 12px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    font-weight: bold;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.home-marquee::before, .home-marquee::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 80px;
+    height: 100%;
+    z-index: 2;
+}
+
+.home-marquee::before {
+    left: 0;
+    background: linear-gradient(to right, #ff8000, transparent);
+}
+
+.home-marquee::after {
+    right: 0;
+    background: linear-gradient(to left, #ff8000, transparent);
+}
+
+.home-marquee span {
+    display: inline-block;
+    padding: 0 40px;
+    animation: home-scroll 10s linear infinite;
+}
+
+@keyframes home-scroll {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Home Hero Section */
+.home-hero-header {
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Home Product Grid */
+.home-products {
+    padding: 60px 0;
+}
+
+.home-product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 60px;
+}
+
+.home-product-card {
+    background-color: transparent;
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.home-product-card:hover {
+    transform: translateY(-12px);
+}
+
+/* Home Product Frame Styles */
+.home-product-frame {
     position: relative;
     padding: 0;
     background: transparent;
@@ -104,8 +132,7 @@ body {
     perspective: 1000px;
 }
 
-
-.frame-inner {
+.home-frame-inner {
     position: relative;
     width: 100%;
     height: 400px;
@@ -115,39 +142,41 @@ body {
     overflow: hidden;
     transform-style: preserve-3d;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    /* REMOVE black background and border - let the image be the background */
+    border: 12px solid #2c2c2c;
     background: transparent;
-    border: none;
-    /* Add shadow directly to the frame */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3),
-    0 4px 12px rgba(0, 0, 0, 0.2);
-    border-radius: 4px; /* Optional: slight rounding */
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
 }
 
-.product-card:hover .frame-inner {
+.home-product-card:hover .home-frame-inner {
     transform: translateY(-8px) rotateX(3deg);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25),
-    0 8px 20px rgba(0, 0, 0, 0.2);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+        0 15px 35px rgba(0, 0, 0, 0.25),
+        0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* IMAGE FILLS ENTIRE FRAME */
-.poster-image-home {
+/* Home Poster Image */
+.home-poster-image {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* This makes the image cover the entire frame */
-    position: absolute; /* Position absolutely to fill the frame */
+    object-fit: cover;
+    position: absolute;
     top: 0;
     left: 0;
     z-index: 1;
 }
 
-.product-card:hover .poster-image {
+.home-product-card:hover .home-poster-image {
     transform: scale(1.05);
     filter: brightness(1.05) contrast(1.1);
 }
 
-/* Text Posters - Full frame with colored backgrounds */
-.poster-content {
+/* Home Text Posters */
+.home-poster-content {
     padding: 40px;
     text-align: center;
     display: flex;
@@ -160,7 +189,7 @@ body {
     z-index: 2;
 }
 
-.poster-title {
+.home-poster-title {
     font-size: 3rem;
     font-weight: 900;
     line-height: 1;
@@ -171,7 +200,7 @@ body {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.poster-subtitle {
+.home-poster-subtitle {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 20px;
@@ -181,17 +210,7 @@ body {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.poster-text {
-    font-size: 1.6rem;
-    line-height: 1.4;
-    margin-bottom: 20px;
-    font-weight: 600;
-    color: #1a1a1a;
-    max-width: 85%;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.divider {
+.home-divider {
     width: 70%;
     height: 4px;
     background: linear-gradient(90deg, transparent, #1a1a1a, transparent);
@@ -200,325 +219,46 @@ body {
     border-radius: 2px;
 }
 
-/* Colored backgrounds for text posters */
-.frame-inner.text-poster .poster-content {
+/* Home Text Poster Backgrounds */
+.home-frame-inner.home-frame-text-poster .home-poster-content {
     background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 50%, #ff6b6b 100%);
 }
 
-.frame-inner.text-poster-2 .poster-content {
+.home-frame-inner.home-frame-text-poster-2 .home-poster-content {
     background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
-.frame-inner.text-poster-3 .poster-content {
+.home-frame-inner.home-frame-text-poster-3 .home-poster-content {
     background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
 
-/* Moving banner */
-.marquee {
-    background: linear-gradient(90deg, #ff8000, #ffa94d, #ff8000);
-    color: white;
-    padding: 12px 0;
-    overflow: hidden;
-    white-space: nowrap;
-    position: relative;
-    font-weight: bold;
-    letter-spacing: 1px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-}
-
-.marquee::before, .marquee::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    width: 80px;
-    height: 100%;
-    z-index: 2;
-}
-
-.marquee::before {
-    left: 0;
-    background: linear-gradient(to right, #ff8000, transparent);
-}
-
-.marquee::after {
-    right: 0;
-    background: linear-gradient(to left, #ff8000, transparent);
-}
-
-.marquee span {
-    display: inline-block;
-    padding: 0 40px;
-    animation: scroll 10s linear infinite;
-}
-
-@keyframes scroll {
-    0% {
-        transform: translateX(100%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-/* Add this to completely reset the icon buttons */
-button[class*="actions"] {
-    background: transparent !important;
-    border: none !important;
-    color: inherit !important;
-}
-
-button[class*="actions"]:hover {
-    background: transparent !important;
-    color: #ff8000 !important;
-}
-
-/* Sticky Header */
-.sticky-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    transform: translateY(-100%);
-    transition: transform 0.3s ease;
-    padding: 15px 0;
-    backdrop-filter: blur(10px);
-}
-
-.sticky-header.visible {
-    transform: translateY(0);
-}
-
-.sticky-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.sticky-logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-decoration: none;
-    color: #333;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: color 0.3s ease;
-}
-
-.sticky-logo:hover {
-    color: #ff8000;
-}
-
-.sticky-logo span {
-    color: #ff8000;
-}
-
-.sticky-actions {
-    display: flex;
-    gap: 15px;
-}
-
-.sticky-actions button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    position: relative;
-    padding: 8px;
-    color: #333;
-    border-radius: 50%;
-    transition: all 0.3s ease; /* Changed from all 0.3s ease to be consistent */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sticky-actions button:hover {
-    background-color: rgba(255, 128, 0, 0.1); /* This creates the orange background */
-    color: #ff8000; /* This changes the icon color to orange */
-    transform: translateY(-2px); /* This adds the lift effect */
-}
-
-.badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: #ff8000;
-    color: white;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 0.7rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-/* COMBINED HEADER + HERO SECTION */
-.hero-header {
-    /* Remove all background properties from here */
-    color: white;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-
-.nav-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    position: relative;
-    z-index: 100;
-}
-
-.nav-logo {
-    font-size: 1.8rem;
-    font-weight: 900;
-    text-decoration: none;
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.nav-logo span {
-    color: #ff8000;
-}
-
-.nav-actions {
-    display: flex;
-    gap: 15px;
-}
-
-.nav-actions button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    position: relative;
-    padding: 8px;
-    color: white;
-    border-radius: 50%;
-    transition: all 0.3s ease; /* Changed from background 0.3s to all 0.3s ease */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.nav-actions button:hover {
-    background: rgba(255, 128, 0, 0.2); /* This creates the orange background */
-    color: #ff8000; /* This changes the icon color to orange */
-    transform: translateY(-2px); /* This adds the lift effect */
-}
-
-.hero-content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 40px 20px;
-    position: relative;
-    z-index: 10;
-}
-
-.hero-content .container {
-    max-width: 800px;
-}
-
-.hero-content p {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: white;
-    opacity: 0.9;
-}
-
-.hero-content h1 {
-    font-size: 4rem;
-    font-weight: 900;
-    margin: 20px 0;
-    color: white;
-    line-height: 1.2;
-}
-
-.hero-buttons {
-    margin-top: 30px;
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-/* Products Section */
-.products {
-    padding: 60px 0;
-}
-
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 60px;
-}
-
-.product-card {
-    background-color: transparent;
-    border-radius: 0;
-    overflow: visible;
-    box-shadow: none;
-    transition: all 0.4s ease;
-    position: relative;
-}
-
-.product-card:hover {
-    transform: translateY(-12px);
-}
-
-.sale-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #ff8000;
-    color: white;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    z-index: 10;
-}
-
-.product-info {
+/* Home Product Info */
+.home-product-info {
     text-align: center;
     padding: 0 10px;
 }
 
-.product-title {
+.home-product-title {
     font-size: 1.3rem;
     font-weight: 700;
     margin-bottom: 8px;
     color: #222;
 }
 
-.product-frame-type {
+.home-product-frame-type {
     color: #666;
     margin-bottom: 10px;
     font-size: 0.9rem;
 }
 
-.product-price {
+.home-product-price {
     color: #ff8000;
     font-weight: bold;
     font-size: 1.2rem;
     margin-bottom: 15px;
 }
 
-.add-to-cart-btn {
+.home-add-to-cart-btn {
     background: #ff8000;
     color: white;
     border: none;
@@ -530,83 +270,14 @@ button[class*="actions"]:hover {
     width: 100%;
 }
 
-.add-to-cart-btn:hover {
+.home-add-to-cart-btn:hover {
     background: #e67300;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(255, 128, 0, 0.3);
 }
 
-.add-to-cart-btn.out-of-stock {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
-.add-to-cart-btn.out-of-stock:hover {
-    background: #ccc;
-    transform: none;
-    box-shadow: none;
-}
-
-/* Cart Sidebar */
-.cart-sidebar {
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 400px;
-    height: 100%;
-    background: #222;
-    color: white;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.4);
-    z-index: 2000;
-}
-
-.cart-content {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.cart-content header {
-    background: #111;
-    color: white;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #ff8000;
-}
-
-.cart-items {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-}
-
-.cart-footer {
-    padding: 20px;
-    border-top: 2px solid #333;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.cart-footer p {
-    text-align: center;
-    margin: 0;
-    font-size: 18px;
-}
-
-.cart-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.cart-buttons .btn {
-    flex: 1;
-}
-
-/* Side Menu */
-.side-menu {
+/* Home Side Menu */
+.home-side-menu {
     position: fixed;
     left: 0;
     top: 0;
@@ -619,7 +290,7 @@ button[class*="actions"]:hover {
     overflow-y: auto;
 }
 
-.menu-overlay {
+.home-menu-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -630,16 +301,16 @@ button[class*="actions"]:hover {
     backdrop-filter: blur(3px);
 }
 
-.menu-content {
+.home-menu-content {
     flex: 1;
     padding: 20px;
 }
 
-.menu-section {
+.home-menu-section {
     margin-bottom: 30px;
 }
 
-.menu-section h3 {
+.home-menu-section h3 {
     color: #ff8000;
     font-size: 16px;
     font-weight: 900;
@@ -651,15 +322,15 @@ button[class*="actions"]:hover {
     gap: 10px;
 }
 
-.menu-list {
+.home-menu-list {
     list-style: none;
 }
 
-.menu-list li {
+.home-menu-list li {
     margin-bottom: 8px;
 }
 
-.menu-list li a {
+.home-menu-list li a {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -673,88 +344,14 @@ button[class*="actions"]:hover {
     border: 2px solid transparent;
 }
 
-.menu-list li a:hover {
+.home-menu-list li a:hover {
     background: #ff8000;
     border-color: #ff8000;
     transform: translateX(5px);
 }
 
-/* Search Modal */
-.search-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.92);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 80px 20px 20px;
-    z-index: 3000;
-    backdrop-filter: blur(5px);
-}
-
-.search-container {
-    width: 100%;
-    max-width: 700px;
-}
-
-.search-box {
-    display: flex;
-    align-items: center;
-    background: #222;
-    border: 2px solid #ff8000;
-    border-radius: 50px;
-    padding: 15px 25px;
-    width: 100%;
-    box-shadow: 0 4px 20px rgba(255, 128, 0, 0.3);
-    transition: all 0.3s;
-}
-
-.search-box:focus-within {
-    border-color: #ffa94d;
-    box-shadow: 0 6px 30px rgba(255, 128, 0, 0.5);
-    transform: translateY(-2px);
-}
-
-.search-box input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 18px;
-    outline: none;
-}
-
-.search-box input::placeholder {
-    color: #888;
-}
-
-.search-box button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #ff8000;
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    transition: transform 0.2s;
-}
-
-.search-box button:hover {
-    transform: rotate(90deg);
-}
-
-.search-info {
-    color: #aaa;
-    font-size: 14px;
-    margin-top: 15px;
-    text-align: center;
-}
-
-/* Footer */
-footer {
+/* Home Footer */
+.home-footer {
     background: #1a1a1a;
     color: white;
     padding: 60px 20px 30px;
@@ -762,7 +359,7 @@ footer {
     border-top: 3px solid #ff8000;
 }
 
-.footer-content {
+.home-footer-content {
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
@@ -771,7 +368,7 @@ footer {
     margin-bottom: 40px;
 }
 
-.footer-section h3 {
+.home-footer-section h3 {
     color: #ff8000;
     font-size: 20px;
     font-weight: 900;
@@ -780,15 +377,15 @@ footer {
     letter-spacing: 1px;
 }
 
-.footer-section ul {
+.home-footer-section ul {
     list-style: none;
 }
 
-.footer-section ul li {
+.home-footer-section ul li {
     margin-bottom: 12px;
 }
 
-.footer-section ul li a {
+.home-footer-section ul li a {
     color: #ccc;
     text-decoration: none;
     transition: all 0.3s;
@@ -798,52 +395,19 @@ footer {
     font-size: 15px;
 }
 
-.footer-section ul li a:hover {
+.home-footer-section ul li a:hover {
     color: #ff8000;
     padding-left: 5px;
 }
 
-.footer-section p {
+.home-footer-section p {
     color: #ccc;
     line-height: 1.8;
     font-size: 15px;
     margin-bottom: 10px;
 }
 
-.contact-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    color: #ccc;
-}
-
-.social-links {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.social-links a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: #2a2a2a;
-    border-radius: 50%;
-    color: white;
-    transition: all 0.3s;
-    border: 2px solid transparent;
-}
-
-.social-links a:hover {
-    background: #ff8000;
-    border-color: #ff8000;
-    transform: translateY(-3px);
-}
-
-.footer-bottom {
+.home-footer-bottom {
     max-width: 1200px;
     margin: 0 auto;
     padding-top: 30px;
@@ -853,65 +417,15 @@ footer {
     font-size: 14px;
 }
 
-.footer-bottom p {
-    margin-bottom: 10px;
-}
-
-.footer-newsletter {
-    margin-top: 20px;
-}
-
-.newsletter-form {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.newsletter-form input {
-    flex: 1;
-    padding: 12px 20px;
-    background: #2a2a2a;
-    border: 2px solid #333;
-    border-radius: 5px;
-    color: white;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.3s;
-}
-
-.newsletter-form input:focus {
-    border-color: #ff8000;
-}
-
-.newsletter-form input::placeholder {
-    color: #666;
-}
-
-.newsletter-form button {
-    padding: 12px 30px;
-    background: #ff8000;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.newsletter-form button:hover {
-    background: #e67300;
-    transform: scale(1.05);
-}
-
-/* Loading and Error States */
-.loading {
+/* Home Loading and Error States */
+.home-loading {
     text-align: center;
     padding: 2rem;
     font-size: 1.1rem;
     color: #666;
 }
 
-.error {
+.home-error {
     text-align: center;
     padding: 2rem;
     color: #ff4444;
@@ -920,110 +434,89 @@ footer {
     margin: 1rem 0;
 }
 
-/* Responsive Frame Adjustments */
+.home-no-products {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+/* Responsive Design for Home */
 @media (max-width: 768px) {
-    .frame-inner {
+    .home-frame-inner {
         height: 320px;
         border-width: 6px;
     }
 
-    .poster-title {
+    .home-poster-title {
         font-size: 2.2rem;
     }
 
-    .poster-subtitle {
+    .home-poster-subtitle {
         font-size: 1.5rem;
     }
 
-    .poster-text {
-        font-size: 1.2rem;
-    }
-
-    .poster-content {
+    .home-poster-content {
         padding: 25px;
     }
 
-    .product-grid {
+    .home-product-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 30px;
     }
 
-    .hero-content h1 {
-        font-size: 36px;
-    }
-
-    .hero-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .hero-buttons .btn {
-        width: 100%;
-        max-width: 250px;
-    }
-
-    .cart-sidebar {
-        width: 100%;
-    }
-
-    .side-menu {
+    .home-side-menu {
         width: 280px;
     }
 
-    .footer-content {
+    .home-footer-content {
         grid-template-columns: 1fr;
         gap: 30px;
-    }
-
-    .newsletter-form {
-        flex-direction: column;
-    }
-
-    .sticky-nav {
-        padding: 0 15px;
-    }
-
-    .sticky-logo {
-        font-size: 1.3rem;
-    }
-
-    .sticky-actions {
-        gap: 10px;
     }
 }
 
 @media (max-width: 480px) {
-    .frame-inner {
+    .home-frame-inner {
         height: 280px;
         border-width: 4px;
     }
 
-    .poster-title {
+    .home-poster-title {
         font-size: 1.8rem;
         letter-spacing: 2px;
     }
 
-    .poster-subtitle {
+    .home-poster-subtitle {
         font-size: 1.3rem;
     }
 
-    .poster-text {
-        font-size: 1.1rem;
-    }
-
-    .poster-content {
+    .home-poster-content {
         padding: 20px;
     }
 
-    .hero-content h1 {
-        font-size: 28px;
-    }
-
-    .section-title {
+    .home-section-title {
         font-size: 26px;
     }
+}
 
-    .sticky-header {
-        padding: 12px 0;
-    }
+/* Custom Poster Specific Styles */
+.home-frame-inner.home-frame-custom-poster .home-poster-content {
+    background: white;
+}
+
+.home-frame-inner.home-frame-custom-poster .home-poster-title,
+.home-frame-inner.home-frame-custom-poster .home-poster-subtitle {
+    color: black;
+    font-weight: 900;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    letter-spacing: 2px;
+}
+
+.home-frame-inner.home-frame-custom-poster .home-poster-title {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.home-frame-inner.home-frame-custom-poster .home-poster-subtitle {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
 }

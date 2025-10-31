@@ -9,7 +9,10 @@ import {
     Trash2,
     Upload,
     Eye,
-    X
+    X,
+    CheckCircle,
+    AlertCircle,
+    Info
 } from 'lucide-react';
 import './AdminDashboard.css';
 
@@ -27,6 +30,78 @@ const AdminDashboard = () => {
     const [orderItems, setOrderItems] = useState({});
     const [showOrderModal, setShowOrderModal] = useState(false);
     const [loadingOrderItems, setLoadingOrderItems] = useState({});
+
+    // Pop-up notification state
+    const [notifications, setNotifications] = useState([]);
+
+    // Add a new notification
+    const addNotification = (message, type = 'info') => {
+        const id = Date.now();
+        const notification = {
+            id,
+            message,
+            type,
+            timestamp: new Date()
+        };
+
+        setNotifications(prev => [notification, ...prev]);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            removeNotification(id);
+        }, 5000);
+    };
+
+    // Remove a notification
+    const removeNotification = (id) => {
+        setNotifications(prev => prev.filter(notification => notification.id !== id));
+    };
+
+    // Notification component
+    const Notification = ({ notification }) => {
+        const getIcon = () => {
+            switch (notification.type) {
+                case 'success':
+                    return <CheckCircle size={20} />;
+                case 'error':
+                    return <AlertCircle size={20} />;
+                default:
+                    return <Info size={20} />;
+            }
+        };
+
+        const getBackgroundColor = () => {
+            switch (notification.type) {
+                case 'success':
+                    return '#10b981';
+                case 'error':
+                    return '#ef4444';
+                default:
+                    return '#3b82f6';
+            }
+        };
+
+        return (
+            <div
+                className="notification"
+                style={{
+                    backgroundColor: getBackgroundColor(),
+                    color: 'white'
+                }}
+            >
+                <div className="notification-content">
+                    {getIcon()}
+                    <span>{notification.message}</span>
+                </div>
+                <button
+                    onClick={() => removeNotification(notification.id)}
+                    className="notification-close"
+                >
+                    <X size={16} />
+                </button>
+            </div>
+        );
+    };
 
     const fetchOrderItems = async (orderId) => {
         setLoadingOrderItems(prev => ({...prev, [orderId]: true}));
@@ -46,7 +121,7 @@ const AdminDashboard = () => {
             }
         } catch (error) {
             console.error('Error fetching order items:', error);
-            alert('Error loading order details: ' + error.message);
+            addNotification('Error loading order details: ' + error.message, 'error');
         } finally {
             setLoadingOrderItems(prev => ({...prev, [orderId]: false}));
         }
@@ -72,7 +147,6 @@ const AdminDashboard = () => {
         };
         return colors[status] || '#6b7280';
     };
-
 
     const getStatusText = (status) => {
         const texts = {
@@ -140,10 +214,9 @@ const AdminDashboard = () => {
                     setOrders(data);
                 }
             }
-            // Categories are now fetched separately on component mount
         } catch (error) {
             console.error('Error fetching data:', error);
-            alert('Error fetching data: ' + error.message);
+            addNotification('Error fetching data: ' + error.message, 'error');
         } finally {
             setLoading(false);
         }
@@ -179,14 +252,14 @@ const AdminDashboard = () => {
             if (response.ok) {
                 setShowAddModal(false);
                 setFormData({title: '', description: '', price: '', category_id: '', stock: '', image: null});
-                fetchData(); // Refresh the posters list
-                // alert('Poster added successfully!');
+                fetchData();
+                addNotification('Poster added successfully!', 'success');
             } else {
-                alert('Error adding poster: ' + result.message);
+                addNotification('Error adding poster: ' + result.message, 'error');
             }
         } catch (error) {
             console.error('Error adding poster:', error);
-            alert('Error adding poster: ' + error.message);
+            addNotification('Error adding poster: ' + error.message, 'error');
         } finally {
             setLoading(false);
         }
@@ -218,14 +291,14 @@ const AdminDashboard = () => {
             if (response.ok) {
                 setEditingPoster(null);
                 setFormData({title: '', description: '', price: '', category_id: '', stock: '', image: null});
-                fetchData(); // Refresh the posters list
-                // alert('Poster updated successfully!');
+                fetchData();
+                addNotification('Poster updated successfully!', 'success');
             } else {
-                alert('Error updating poster: ' + result.message);
+                addNotification('Error updating poster: ' + result.message, 'error');
             }
         } catch (error) {
             console.error('Error editing poster:', error);
-            alert('Error editing poster: ' + error.message);
+            addNotification('Error editing poster: ' + error.message, 'error');
         } finally {
             setLoading(false);
         }
@@ -246,17 +319,14 @@ const AdminDashboard = () => {
             const result = await response.json();
 
             if (response.ok) {
-                // Remove the poster from the local state immediately
                 setPosters(prevPosters => prevPosters.filter(poster => poster.id !== posterId));
-                alert('Poster deleted successfully!');
+                addNotification('Poster deleted successfully!', 'success');
             } else {
-                alert('Error deleting poster: ' + result.message);
+                addNotification('Error deleting poster: ' + result.message, 'error');
 
-                // If it's a foreign key error, offer alternative
                 if (result.message.includes('referenced in existing orders')) {
                     // eslint-disable-next-line no-restricted-globals
                     if (confirm('This poster is in existing orders. Would you like to hide it by setting stock to 0 instead?')) {
-                        // Call function to set stock to 0
                         const updateResponse = await fetch(`http://localhost:5000/api/admin/posters/${posterId}`, {
                             method: 'PUT',
                             headers: {
@@ -267,22 +337,22 @@ const AdminDashboard = () => {
                         });
 
                         if (updateResponse.ok) {
-                            fetchData(); // Refresh data
-                            alert('Poster hidden (stock set to 0)!');
+                            fetchData();
+                            addNotification('Poster hidden (stock set to 0)!', 'success');
                         }
                     }
                 }
             }
         } catch (error) {
             console.error('Error deleting poster:', error);
-            alert('Error deleting poster: ' + error.message);
+            addNotification('Error deleting poster: ' + error.message, 'error');
         }
     };
 
     const handleAddCategory = async (e) => {
         e.preventDefault();
         if (!newCategory.trim()) {
-            alert('Please enter a category name');
+            addNotification('Please enter a category name', 'error');
             return;
         }
 
@@ -302,14 +372,14 @@ const AdminDashboard = () => {
             if (response.ok) {
                 setNewCategory('');
                 setShowCategoryModal(false);
-                fetchCategories(); // Refresh categories list
-                // alert('Category added successfully!');
+                fetchCategories();
+                addNotification('Category added successfully!', 'success');
             } else {
-                alert('Error adding category: ' + result.message);
+                addNotification('Error adding category: ' + result.message, 'error');
             }
         } catch (error) {
             console.error('Error adding category:', error);
-            alert('Error adding category: ' + error.message);
+            addNotification('Error adding category: ' + error.message, 'error');
         }
     };
 
@@ -328,14 +398,14 @@ const AdminDashboard = () => {
             const result = await response.json();
 
             if (response.ok) {
-                fetchCategories(); // Refresh categories
-                alert('Category deleted successfully!');
+                fetchCategories();
+                addNotification('Category deleted successfully!', 'success');
             } else {
-                alert('Error deleting category: ' + result.message);
+                addNotification('Error deleting category: ' + result.message, 'error');
             }
         } catch (error) {
             console.error('Error deleting category:', error);
-            alert('Error deleting category: ' + error.message);
+            addNotification('Error deleting category: ' + error.message, 'error');
         }
     };
 
@@ -355,13 +425,13 @@ const AdminDashboard = () => {
 
             if (response.ok) {
                 fetchData();
-                alert('Order status updated successfully!');
+                addNotification('Order status updated successfully!', 'success');
             } else {
-                alert('Error updating order: ' + result.message);
+                addNotification('Error updating order: ' + result.message, 'error');
             }
         } catch (error) {
             console.error('Error updating order:', error);
-            alert('Error updating order: ' + error.message);
+            addNotification('Error updating order: ' + error.message, 'error');
         }
     };
 
@@ -385,6 +455,13 @@ const AdminDashboard = () => {
 
     return (
         <div className="admin-dashboard">
+            {/* Notification Container */}
+            <div className="notifications-container">
+                {notifications.map(notification => (
+                    <Notification key={notification.id} notification={notification} />
+                ))}
+            </div>
+
             {/* Header */}
             <div className="admin-header">
                 <div className="admin-header-content">
@@ -541,9 +618,8 @@ const AdminDashboard = () => {
                                 <div className="tab-content">
                                     <div className="section-header">
                                         <h2>Categories Management</h2>
-                                        <p>Manage poster categories</p>
                                         <button
-                                            className="btn btn-primary"
+                                            className="add-category"
                                             onClick={() => setShowCategoryModal(true)}
                                         >
                                             <Plus size={16}/>
@@ -551,17 +627,19 @@ const AdminDashboard = () => {
                                         </button>
                                     </div>
 
-                                    <div className="categories-grid">
+                                    <div className="admin-categories-grid">
                                         {categories.map(category => (
-                                            <div key={category.id} className="category-card">
+                                            <div key={category.id} className="admin-category-card">
                                                 <h3>{category.name}</h3>
-                                                <div className="category-actions">
-                                                    <button
-                                                        className="btn-icon delete"
-                                                        onClick={() => handleDeleteCategory(category.id)}
-                                                    >
-                                                        <Trash2 size={16}/>
-                                                    </button>
+                                                <div className="admin-category-stats">
+                                                    <div className="admin-category-actions">
+                                                        <button
+                                                            className="btn-icon delete"
+                                                            onClick={() => handleDeleteCategory(category.id)}
+                                                        >
+                                                            <Trash2 size={16}/>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
@@ -742,8 +820,8 @@ const AdminDashboard = () => {
                                             fontSize: '12px'
                                         }}
                                     >
-                            {getStatusText(selectedOrder.status)}
-                        </span>
+                                        {getStatusText(selectedOrder.status)}
+                                    </span>
                                 </div>
                             </div>
 
@@ -763,11 +841,17 @@ const AdminDashboard = () => {
                                                 <div className="item-info">
                                                     <h5>{item.poster_title || 'Unknown Poster'}</h5>
                                                     <div className="item-details">
-                                                        <span>Quantity: {item.quantity}</span>
-                                                        <span>Price: LE {Number(item.price).toFixed(2)}</span>
+                                                        <div className="item-detail-row">
+                                                            <span>Quantity: {item.quantity}</span>
+                                                            <span>Price: LE {Number(item.price).toFixed(2)}</span>
+                                                        </div>
+                                                        <div className="item-detail-row">
+                                                            <span className="item-frame">Frame: {item.frame || 'Black Frame'}</span>
+                                                            <span className="item-size">Size: {item.size || '30×40 cm'}</span>
+                                                        </div>
                                                         <span className="item-total">
-                                                Total: LE {(item.quantity * item.price).toFixed(2)}
-                                            </span>
+                                                            Total: LE {(item.quantity * item.price).toFixed(2)}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>

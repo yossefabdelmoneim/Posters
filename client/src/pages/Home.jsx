@@ -1,18 +1,18 @@
 // src/pages/Home.jsx
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import {
     Menu, User, ShoppingBag, X,
     Grid, Layers, Frame, Star, TrendingUp, Tag,
     Palette, UserCircle, Package, Heart, Settings,
     HelpCircle, Mail, MessageCircle, MapPin
 } from "lucide-react";
-import { useCart } from "../Context/CartContext";
-import { useNavigate } from "react-router-dom";
+import {useCart} from "../Context/CartContext";
+import {useNavigate} from "react-router-dom";
 import "./Home.css";
 import Navbar from "../components/Navbar";
 
 const Home = () => {
-    const { addToCart, getCartItemsCount } = useCart();
+    const {addToCart, getCartItemsCount} = useCart();
     const navigate = useNavigate();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,22 +49,53 @@ const Home = () => {
                     console.log('Categories data received:', categoriesData);
                 }
 
+                // Filter out any custom poster that might be in the database (id 999)
+                const filteredPosters = postersData.filter(poster => poster.id !== 999);
+
                 // Transform poster data to match your component structure
-                const transformedProducts = postersData.map(poster => ({
+                const transformedProducts = filteredPosters.map(poster => ({
                     id: poster.id,
                     title: poster.title,
                     description: poster.description || "No description available",
                     type: poster.category_name ? `${poster.category_name} • 30×40 cm` : 'Standard Frame • 30×40 cm',
                     price: parseFloat(poster.price) || 0,
-                    // Determine if it's a text poster based on content
-                    isText: !poster.image_url || poster.description?.length > 50,
+                    isText: false, // All regular posters are image posters
                     image: poster.image_url || getFallbackImage(poster.id),
                     category_name: poster.category_name,
-                    // Generate content for text posters
-                    content: generateTextContent(poster.title, poster.description),
-                    // Include original data for product detail page
+                    content: null,
                     originalData: poster
                 }));
+
+                // Add custom poster as a special product - ONLY ONE CUSTOM POSTER
+                const customPoster = {
+                    id: 999,
+                    title: "Custom Poster - Upload Your Design",
+                    description: "Upload your own image and create a custom poster. We'll print your design on high-quality poster paper.",
+                    type: "Custom Design • Multiple Sizes",
+                    price: 250.00,
+                    isText: true, // This is explicitly a text poster for homepage display
+                    image: null,
+                    category_name: "Custom",
+                    content: {
+                        title: "UPLOAD",
+                        subtitle: "YOUR",
+                        title2: "DESIGN",
+                        subtitle2: "HERE!"
+                    },
+                    originalData: {
+                        id: 999,
+                        title: "Custom Poster - Upload Your Design",
+                        description: "Upload your own image and create a custom poster. We'll print your design on high-quality poster paper.",
+                        price: 250.00,
+                        image_url: null,
+                        stock: 9999,
+                        category_name: "Custom",
+                        is_custom: true
+                    }
+                };
+
+                // Add custom poster to the beginning of the products array
+                transformedProducts.unshift(customPoster);
 
                 console.log('Transformed products:', transformedProducts);
                 setProducts(transformedProducts);
@@ -73,8 +104,6 @@ const Home = () => {
             } catch (err) {
                 console.error('Error fetching data:', err);
                 setError('Failed to load products. Please try again later.');
-                // Fallback to sample data
-                // setProducts(getSampleProducts());
             } finally {
                 setLoading(false);
             }
@@ -82,40 +111,6 @@ const Home = () => {
 
         fetchData();
     }, []);
-
-    // Helper function to generate text content for text-based posters
-    const generateTextContent = (title, description) => {
-        if (!description) {
-            // Split title into parts for text posters
-            const words = title.split(' ');
-            if (words.length >= 4) {
-                const mid = Math.floor(words.length / 2);
-                return {
-                    title: words.slice(0, mid).join(' '),
-                    subtitle: words.slice(mid).join(' ')
-                };
-            } else {
-                return {
-                    title: title,
-                    subtitle: "Express Yourself"
-                };
-            }
-        }
-
-        // Use description for content
-        const sentences = description.split('.');
-        if (sentences.length >= 2) {
-            return {
-                title: sentences[0].trim(),
-                subtitle: sentences[1].trim()
-            };
-        }
-
-        return {
-            title: title,
-            subtitle: description.length > 30 ? description.substring(0, 30) + "..." : description
-        };
-    };
 
     // Helper function for fallback images
     const getFallbackImage = (id) => {
@@ -127,53 +122,61 @@ const Home = () => {
         return images[id % images.length];
     };
 
-
     // Menu functions
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
     const handleAddToCart = (product, e) => {
         e.stopPropagation(); // Prevent navigation when clicking add to cart
+
+        // For custom poster, navigate to custom poster page instead of adding to cart directly
+        if (product.id === 999) {
+            navigate('/poster/999');
+            return;
+        }
+
         addToCart(product);
     };
 
     const handlePosterClick = (poster) => {
         // Navigate to product detail page
-        navigate(`/poster/${poster.id}`, {
-            state: { poster }
-        });
+        navigate(`/poster/${poster.id}`);
     };
 
-    // Get frame style class based on product
-    const getFrameStyle = (product, index) => {
+    // Get frame style class based on product - HOME SPECIFIC
+    const getHomeFrameStyle = (product, index) => {
         const frameStyles = [
-            'frame-modern-black',
-            'frame-gallery',
-            'frame-floating',
-            'frame-minimal',
-            'frame-luxury',
-            'frame-text-poster',
-            'frame-text-poster-2',
-            'frame-text-poster-3'
+            'home-frame-modern-black',
+            'home-frame-gallery',
+            'home-frame-floating',
+            'home-frame-minimal',
+            'home-frame-luxury',
+            'home-frame-text-poster',
+            'home-frame-text-poster-2',
+            'home-frame-text-poster-3'
         ];
 
         if (product.isText) {
+            // For custom poster, use a specific style
+            if (product.id === 999) {
+                return 'home-frame-custom-poster';
+            }
             return frameStyles[5 + (index % 3)]; // Use text poster frames
         }
         return frameStyles[index % 5]; // Use regular frames
     };
 
     return (
-        <div className="home">
+        <div className="home-page">
             <Navbar/>
 
             {/* Marquee */}
-            <div className="marquee">
+            <div className="home-marquee">
                 <span>SHIPPING ALL OVER EGYPT • FREE SHIPPING ABOVE 2500 EGP • LIMITED EDITION DESIGNS AVAILABLE NOW</span>
             </div>
 
             {/* Hero Section */}
             <section
-                className="hero-header"
+                className="home-hero-header"
                 style={{
                     backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/BackGroundImage.jpg")`,
                     backgroundSize: 'cover',
@@ -181,22 +184,22 @@ const Home = () => {
                     backgroundRepeat: 'no-repeat'
                 }}
             >
-                
+
             </section>
 
             {/* Products Section */}
-            <section className="products section" id="products">
-                <div className="container">
-                    <h2 className="section-title">FEATURED POSTERS</h2>
+            <section className="home-products home-section" id="products">
+                <div className="home-container">
+                    <h2 className="home-section-title">FEATURED POSTERS</h2>
 
                     {loading && (
-                        <div className="loading" style={{ textAlign: 'center', padding: '60px', fontSize: '18px' }}>
+                        <div className="home-loading" style={{textAlign: 'center', padding: '60px', fontSize: '18px'}}>
                             Loading products...
                         </div>
                     )}
 
                     {error && (
-                        <div className="error" style={{
+                        <div className="home-error" style={{
                             textAlign: 'center',
                             padding: '40px',
                             color: '#dc3545',
@@ -209,31 +212,33 @@ const Home = () => {
                     )}
 
                     {!loading && !error && products.length === 0 && (
-                        <div className="no-products" style={{ textAlign: 'center', padding: '60px', color: '#666' }}>
-                            <p style={{ fontSize: '18px', marginBottom: '10px' }}>No posters found</p>
+                        <div className="home-no-products" style={{textAlign: 'center', padding: '60px', color: '#666'}}>
+                            <p style={{fontSize: '18px', marginBottom: '10px'}}>No posters found</p>
                         </div>
                     )}
 
                     {!loading && !error && products.length > 0 && (
-                        <div className="product-grid">
+                        <div className="home-product-grid">
                             {products.map((product, index) => (
                                 <div
                                     key={product.id}
-                                    className="product-card"
+                                    className="home-product-card"
                                     onClick={() => handlePosterClick(product)}
-                                    style={{ cursor: 'pointer' }}
+                                    style={{cursor: 'pointer'}}
                                 >
-                                    <div className="product-frame">
-                                        <div className={`frame-inner ${getFrameStyle(product, index)}`}>
+                                    <div className="home-product-frame">
+                                        <div className={`home-frame-inner ${getHomeFrameStyle(product, index)}`}>
                                             {product.isText ? (
-                                                <div className="poster-content">
-                                                    <div className="poster-title">{product.content.title}</div>
-                                                    <div className="poster-subtitle">{product.content.subtitle}</div>
-                                                    {product.content.title2 && (
+                                                <div className="home-poster-content">
+                                                    <div className="home-poster-title">{product.content?.title}</div>
+                                                    <div
+                                                        className="home-poster-subtitle">{product.content?.subtitle}</div>
+                                                    {product.content?.title2 && (
                                                         <>
-                                                            <div className="divider"></div>
-                                                            <div className="poster-title">{product.content.title2}</div>
-                                                            <div className="poster-subtitle">{product.content.subtitle2}</div>
+                                                            <div
+                                                                className="home-poster-title">{product.content.title2}</div>
+                                                            <div
+                                                                className="home-poster-subtitle">{product.content.subtitle2}</div>
                                                         </>
                                                     )}
                                                 </div>
@@ -241,7 +246,7 @@ const Home = () => {
                                                 <img
                                                     src={product.image}
                                                     alt={product.title}
-                                                    className="poster-image-home"
+                                                    className="home-poster-image"
                                                     onError={(e) => {
                                                         e.target.src = getFallbackImage(product.id);
                                                     }}
@@ -249,15 +254,15 @@ const Home = () => {
                                             )}
                                         </div>
                                     </div>
-                                    <div className="product-info">
-                                        <h3 className="product-title">{product.title}</h3>
-                                        <p className="product-frame-type">{product.type}</p>
-                                        <p className="product-price">LE {product.price.toFixed(2)}</p>
+                                    <div className="home-product-info">
+                                        <h3 className="home-product-title">{product.title}</h3>
+                                        <p className="home-product-frame-type">{product.type}</p>
+                                        <p className="home-product-price">LE {product.price.toFixed(2)}</p>
                                         <button
-                                            className="add-to-cart-btn"
+                                            className="home-add-to-cart-btn"
                                             onClick={(e) => handleAddToCart(product, e)}
                                         >
-                                            + Add to Cart
+                                            {product.id === 999 ? 'Customize Now' : '+ Add to Cart'}
                                         </button>
                                     </div>
                                 </div>
@@ -270,8 +275,8 @@ const Home = () => {
             {/* Side Menu */}
             {isMenuOpen && (
                 <>
-                    <div className="menu-overlay" onClick={toggleMenu}></div>
-                    <div className="side-menu">
+                    <div className="home-menu-overlay" onClick={toggleMenu}></div>
+                    <div className="home-side-menu">
                         <header style={{
                             display: 'flex',
                             justifyContent: 'space-between',
@@ -279,25 +284,25 @@ const Home = () => {
                             padding: '20px',
                             borderBottom: '2px solid #333'
                         }}>
-                            <h2 style={{ margin: 0, color: 'white' }}>MENU</h2>
+                            <h2 style={{margin: 0, color: 'white'}}>MENU</h2>
                             <button
                                 onClick={toggleMenu}
                                 aria-label="Close Menu"
-                                style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
+                                style={{background: 'none', border: 'none', color: 'white', cursor: 'pointer'}}
                             >
-                                <X size={20} />
+                                <X size={20}/>
                             </button>
                         </header>
-                        <div className="menu-content">
+                        <div className="home-menu-content">
                             {/* Categories Section */}
-                            <div className="menu-section">
-                                <h3><Grid size={18} /> Categories</h3>
-                                <ul className="menu-list">
-                                    <li><a href="#products"><Layers size={16} /> All Collections</a></li>
+                            <div className="home-menu-section">
+                                <h3><Grid size={18}/> Categories</h3>
+                                <ul className="home-menu-list">
+                                    <li><a href="#products"><Layers size={16}/> All Collections</a></li>
                                     {categories.map(category => (
                                         <li key={category.id}>
                                             <a href={`/category/${category.id}`}>
-                                                <Frame size={16} /> {category.name}
+                                                <Frame size={16}/> {category.name}
                                             </a>
                                         </li>
                                     ))}
@@ -305,34 +310,34 @@ const Home = () => {
                             </div>
 
                             {/* Shop Section */}
-                            <div className="menu-section">
-                                <h3><ShoppingBag size={18} /> Shop</h3>
-                                <ul className="menu-list">
-                                    <li><a href="#products"><Star size={16} /> New Arrivals</a></li>
-                                    <li><a href="#products"><TrendingUp size={16} /> Best Sellers</a></li>
-                                    <li><a href="#products"><Tag size={16} /> On Sale</a></li>
-                                    <li><a href="#products"><Palette size={16} /> Custom Design</a></li>
+                            <div className="home-menu-section">
+                                <h3><ShoppingBag size={18}/> Shop</h3>
+                                <ul className="home-menu-list">
+                                    <li><a href="#products"><Star size={16}/> New Arrivals</a></li>
+                                    <li><a href="#products"><TrendingUp size={16}/> Best Sellers</a></li>
+                                    <li><a href="#products"><Tag size={16}/> On Sale</a></li>
+                                    <li><a href="/poster/999"><Palette size={16}/> Custom Design</a></li>
                                 </ul>
                             </div>
 
                             {/* Account Section */}
-                            <div className="menu-section">
-                                <h3><User size={18} /> Account</h3>
-                                <ul className="menu-list">
-                                    <li><a href="/profile"><UserCircle size={16} /> My Profile</a></li>
-                                    <li><a href="/orders"><Package size={16} /> My Orders</a></li>
-                                    <li><a href="/wishlist"><Heart size={16} /> Wishlist</a></li>
-                                    <li><a href="/settings"><Settings size={16} /> Settings</a></li>
+                            <div className="home-menu-section">
+                                <h3><User size={18}/> Account</h3>
+                                <ul className="home-menu-list">
+                                    <li><a href="/profile"><UserCircle size={16}/> My Profile</a></li>
+                                    <li><a href="/orders"><Package size={16}/> My Orders</a></li>
+                                    <li><a href="/wishlist"><Heart size={16}/> Wishlist</a></li>
+                                    <li><a href="/settings"><Settings size={16}/> Settings</a></li>
                                 </ul>
                             </div>
 
                             {/* Help Section */}
-                            <div className="menu-section">
-                                <h3><HelpCircle size={18} /> Help</h3>
-                                <ul className="menu-list">
-                                    <li><a href="/contact"><Mail size={16} /> Contact Us</a></li>
-                                    <li><a href="/faq"><MessageCircle size={16} /> FAQ</a></li>
-                                    <li><a href="/track-order"><MapPin size={16} /> Track Order</a></li>
+                            <div className="home-menu-section">
+                                <h3><HelpCircle size={18}/> Help</h3>
+                                <ul className="home-menu-list">
+                                    <li><a href="/contact"><Mail size={16}/> Contact Us</a></li>
+                                    <li><a href="/faq"><MessageCircle size={16}/> FAQ</a></li>
+                                    <li><a href="/track-order"><MapPin size={16}/> Track Order</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -341,33 +346,16 @@ const Home = () => {
             )}
 
             {/* Footer */}
-            <footer>
-                <div className="footer-content">
-                    <div className="footer-section">
+            <footer className="home-footer">
+                <div className="home-footer-content">
+                    <div className="home-footer-section">
                         <h3>FLXR STUDIOS</h3>
-                        <p>Expressing what words can't through bold, loud designs that make a statement in any space.</p>
-                    </div>
-                    <div className="footer-section">
-                        <h3>Quick Links</h3>
-                        <ul>
-                            <li><a href="#products">Shop All</a></li>
-                            <li><a href="#products">New Arrivals</a></li>
-                            <li><a href="#products">Best Sellers</a></li>
-                            <li><a href="#products">Custom Designs</a></li>
-                        </ul>
-                    </div>
-                    <div className="footer-section">
-                        <h3>Support</h3>
-                        <ul>
-                            <li><a href="/contact">Contact Us</a></li>
-                            <li><a href="/shipping">Shipping Info</a></li>
-                            <li><a href="/returns">Returns</a></li>
-                            <li><a href="/faq">FAQ</a></li>
-                        </ul>
+                        <p>Expressing what words can't through bold, loud designs that make a statement in any
+                            space.</p>
                     </div>
                 </div>
-                <div className="footer-bottom">
-                    <p>&copy; 2024 FLXR STUDIOS. All rights reserved.</p>
+                <div className="home-footer-bottom">
+                    <p>&copy; {new Date().getFullYear()} FLXR STUDIOS. All rights reserved.</p>
                 </div>
             </footer>
         </div>

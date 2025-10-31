@@ -61,9 +61,8 @@ function CategoryPage() {
         quantity: 1
       });
       // Optional: Show feedback to user
-      // alert(`${poster.title} added to cart!`);
     } else {
-      // alert('This poster is out of stock!');
+      alert('This poster is out of stock!');
     }
   };
 
