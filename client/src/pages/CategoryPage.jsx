@@ -96,7 +96,7 @@ function CategoryPage() {
               <div style={{ marginTop: 'auto', padding: '20px 0' }}>
                 <button
                   className="nav-item1"
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/shop')}
                 >
                   <Home size={20}/>
                   All Categories

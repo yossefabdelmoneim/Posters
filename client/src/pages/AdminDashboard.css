@@ -414,7 +414,7 @@
 }
 
 .modal-content {
-    background: white;
+    background-color: white;
     border-radius: 12px;
     padding: 0;
     width: 100%;
@@ -424,6 +424,7 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     position: relative;
     z-index: 10001;
+
 }
 
 .modal-header {
@@ -843,5 +844,87 @@
     .notification {
         min-width: auto;
         width: 100%;
+    }
+}
+/* Clickable Poster Styles */
+.poster-clickable-area {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.poster-clickable-area:hover {
+    transform: translateY(-2px);
+}
+
+.poster-image1 {
+    position: relative;
+    overflow: hidden;
+}
+
+.poster-view-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.poster-image1:hover .poster-view-overlay {
+    opacity: 1;
+}
+
+.poster-view-overlay svg {
+    margin-bottom: 8px;
+}
+
+.poster-view-overlay span {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Enhanced poster card for clickable behavior */
+.poster-card {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.poster-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Ensure actions are still accessible */
+.poster-actions {
+    position: relative;
+    z-index: 2;
+}
+
+/* Confirmation modal specific styles */
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e5e5;
+}
+
+/* Responsive adjustments for clickable posters */
+@media (max-width: 768px) {
+    .poster-view-overlay {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .poster-view-overlay span {
+        font-size: 12px;
     }
 }

@@ -1,3 +1,4 @@
+// AdminDashboard.jsx
 import React, {useState, useEffect} from 'react';
 import {
     Package,
@@ -12,8 +13,10 @@ import {
     X,
     CheckCircle,
     AlertCircle,
-    Info
+    Info,
+    ExternalLink
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -30,6 +33,13 @@ const AdminDashboard = () => {
     const [orderItems, setOrderItems] = useState({});
     const [showOrderModal, setShowOrderModal] = useState(false);
     const [loadingOrderItems, setLoadingOrderItems] = useState({});
+    const navigate = useNavigate();
+
+
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [confirmAction, setConfirmAction] = useState(null);
+    const [confirmMessage, setConfirmMessage] = useState('');
+    const [actionCallback, setActionCallback] = useState(null);
 
     // Pop-up notification state
     const [notifications, setNotifications] = useState([]);
@@ -55,6 +65,33 @@ const AdminDashboard = () => {
     // Remove a notification
     const removeNotification = (id) => {
         setNotifications(prev => prev.filter(notification => notification.id !== id));
+    };
+
+
+    const showConfirmation = (message, callback) => {
+        setConfirmMessage(message);
+        setActionCallback(() => callback);
+        setShowConfirmModal(true);
+    };
+
+
+    const handleConfirm = () => {
+        if (actionCallback) {
+            actionCallback();
+        }
+        setShowConfirmModal(false);
+        setActionCallback(null);
+    };
+
+
+    const handleCancelConfirm = () => {
+        setShowConfirmModal(false);
+        setActionCallback(null);
+    };
+
+
+    const handlePosterClick = (posterId) => {
+        navigate(`/poster/${posterId}`);
     };
 
     // Notification component
@@ -305,48 +342,55 @@ const AdminDashboard = () => {
     };
 
     const handleDeletePoster = async (posterId) => {
-        if (!window.confirm('Are you sure you want to permanently delete this poster? This action cannot be undone.')) return;
 
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/admin/posters/${posterId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+        showConfirmation(
+            'Are you sure you want to permanently delete this poster? This action cannot be undone.',
+            async () => {
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`http://localhost:5000/api/admin/posters/${posterId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
 
-            const result = await response.json();
+                    const result = await response.json();
 
-            if (response.ok) {
-                setPosters(prevPosters => prevPosters.filter(poster => poster.id !== posterId));
-                addNotification('Poster deleted successfully!', 'success');
-            } else {
-                addNotification('Error deleting poster: ' + result.message, 'error');
+                    if (response.ok) {
+                        setPosters(prevPosters => prevPosters.filter(poster => poster.id !== posterId));
+                        addNotification('Poster deleted successfully!', 'success');
+                    } else {
+                        addNotification('Error deleting poster: ' + result.message, 'error');
 
-                if (result.message.includes('referenced in existing orders')) {
-                    // eslint-disable-next-line no-restricted-globals
-                    if (confirm('This poster is in existing orders. Would you like to hide it by setting stock to 0 instead?')) {
-                        const updateResponse = await fetch(`http://localhost:5000/api/admin/posters/${posterId}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Authorization': `Bearer ${token}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({stock: 0})
-                        });
+                        if (result.message.includes('referenced in existing orders')) {
 
-                        if (updateResponse.ok) {
-                            fetchData();
-                            addNotification('Poster hidden (stock set to 0)!', 'success');
+                            showConfirmation(
+                                'This poster is in existing orders. Would you like to hide it by setting stock to 0 instead?',
+                                async () => {
+                                    const updateResponse = await fetch(`http://localhost:5000/api/admin/posters/${posterId}`, {
+                                        method: 'PUT',
+                                        headers: {
+                                            'Authorization': `Bearer ${token}`,
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({stock: 0})
+                                    });
+
+                                    if (updateResponse.ok) {
+                                        fetchData();
+                                        addNotification('Poster hidden (stock set to 0)!', 'success');
+                                    }
+                                }
+                            );
                         }
                     }
+                } catch (error) {
+                    console.error('Error deleting poster:', error);
+                    addNotification('Error deleting poster: ' + error.message, 'error');
                 }
             }
-        } catch (error) {
-            console.error('Error deleting poster:', error);
-            addNotification('Error deleting poster: ' + error.message, 'error');
-        }
+        );
     };
 
     const handleAddCategory = async (e) => {
@@ -384,29 +428,33 @@ const AdminDashboard = () => {
     };
 
     const handleDeleteCategory = async (categoryId) => {
-        if (!window.confirm('Are you sure you want to delete this category? Posters in this category will have their category set to NULL.')) return;
 
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/admin/category/${categoryId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+        showConfirmation(
+            'Are you sure you want to delete this category?',
+            async () => {
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`http://localhost:5000/api/admin/category/${categoryId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        fetchCategories();
+                        addNotification('Category deleted successfully!', 'success');
+                    } else {
+                        addNotification('Error deleting category: ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting category:', error);
+                    addNotification('Error deleting category: ' + error.message, 'error');
                 }
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                fetchCategories();
-                addNotification('Category deleted successfully!', 'success');
-            } else {
-                addNotification('Error deleting category: ' + result.message, 'error');
             }
-        } catch (error) {
-            console.error('Error deleting category:', error);
-            addNotification('Error deleting category: ' + error.message, 'error');
-        }
+        );
     };
 
     const handleUpdateOrderStatus = async (orderId, newStatus) => {
@@ -528,24 +576,43 @@ const AdminDashboard = () => {
                                         <div className="posters-grid">
                                             {posters.map(poster => (
                                                 <div key={poster.id} className="poster-card">
-                                                    <div className="poster-image1">
-                                                        <img src={poster.image_url} alt={poster.title}/>
-                                                    </div>
-                                                    <div className="poster-info">
-                                                        <h3>{poster.title}</h3>
-                                                        <p className="poster-category1">{poster.category_name || 'Uncategorized'}</p>
-                                                        <p className="poster-price1">LE {poster.price}</p>
+
+                                                    <div
+                                                        className="poster-clickable-area"
+                                                        onClick={() => handlePosterClick(poster.id)}
+                                                    >
+                                                        <div className="poster-image1">
+                                                            <img src={poster.image_url} alt={poster.title}/>
+                                                            <div className="poster-view-overlay">
+                                                                <ExternalLink size={24} />
+                                                                <span>View Details</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="poster-info">
+                                                            <h3>{poster.title}</h3>
+                                                            <p className="poster-category1">{poster.category_name || 'Uncategorized'}</p>
+                                                            <p className="poster-price1">LE {poster.price}</p>
+                                                            <p className="poster-stock">Stock: {poster.stock}</p>
+                                                        </div>
                                                     </div>
                                                     <div className="poster-actions">
                                                         <button
                                                             className="btn-icon edit"
-                                                            onClick={() => openEditModal(poster)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                openEditModal(poster);
+                                                            }}
+                                                            title="Edit Poster"
                                                         >
                                                             <Edit size={16}/>
                                                         </button>
                                                         <button
                                                             className="btn-icon delete"
-                                                            onClick={() => handleDeletePoster(poster.id)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeletePoster(poster.id);
+                                                            }}
+                                                            title="Delete Poster"
                                                         >
                                                             <Trash2 size={16}/>
                                                         </button>
@@ -783,6 +850,42 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             )}
+
+            {/* ✅ ADDED: Confirmation Modal */}
+            {showConfirmModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>Confirm Action</h3>
+                            <button className="close-btn" onClick={handleCancelConfirm}>
+                                <X size={20}/>
+                            </button>
+                        </div>
+                        <div style={{ padding: '24px', textAlign: 'center' }}>
+                            <AlertCircle size={48} color="#f59e0b" style={{ marginBottom: '16px' }} />
+                            <p style={{ fontSize: '16px', color: '#333', marginBottom: '24px', lineHeight: '1.5' }}>
+                                {confirmMessage}
+                            </p>
+                            <div className="modal-actions">
+                                <button
+                                    className="btn btn-outline"
+                                    onClick={handleCancelConfirm}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleConfirm}
+                                    style={{ backgroundColor: '#ef4444', borderColor: '#ef4444' }}
+                                >
+                                    Confirm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Order Details Modal */}
             {showOrderModal && selectedOrder && (
                 <div className="modal-overlay">

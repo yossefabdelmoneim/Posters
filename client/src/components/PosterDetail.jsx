@@ -18,10 +18,10 @@ function PosterDetails() {
     const [recommendedPosters, setRecommendedPosters] = useState([]);
     const [loadingRecommended, setLoadingRecommended] = useState(false);
 
-    // ✅ ADDED: State for frame color
+    // State for frame class
     const [frameClass, setFrameClass] = useState("black-frame");
 
-    // ✅ ADDED: State for custom poster upload
+    // Custom poster upload
     const [customImage, setCustomImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [uploadError, setUploadError] = useState(null);
@@ -45,7 +45,7 @@ function PosterDetails() {
         "50*70 cm"
     ];
 
-    // ✅ ADDED: Function to map style to frame class
+    // UPDATED: Map style to frame class — "Coated Paper" = no frame
     const getFrameClassFromStyle = (style) => {
         switch(style) {
             case "Black Frame":
@@ -55,45 +55,39 @@ function PosterDetails() {
             case "Tableau Wooden NDF":
                 return "wood-frame";
             case "350 gsm Coated Paper":
-                return "paper-frame";
+                return "no-frame";  // REMOVES ALL FRAME
             default:
                 return "black-frame";
         }
     };
 
-    // ✅ ADDED: Function to handle style selection
+    // Handle style selection
     const handleStyleSelect = (style) => {
         setSelectedStyle(style);
         setFrameClass(getFrameClassFromStyle(style));
     };
 
-    // ✅ ADDED: Custom poster image upload functions
+    // Custom image upload
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         setUploadError(null);
 
         if (!file) return;
 
-        // Validate file type
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         if (!validTypes.includes(file.type)) {
             setUploadError('Please upload a valid image file (JPEG, PNG, GIF, or WebP)');
             return;
         }
 
-        // Validate file size (5MB max)
         if (file.size > 5 * 1024 * 1024) {
             setUploadError('Image size must be less than 5MB');
             return;
         }
 
         setCustomImage(file);
-
-        // Create preview
         const reader = new FileReader();
-        reader.onload = (e) => {
-            setImagePreview(e.target.result);
-        };
+        reader.onload = (e) => setImagePreview(e.target.result);
         reader.readAsDataURL(file);
     };
 
@@ -101,19 +95,25 @@ function PosterDetails() {
         setCustomImage(null);
         setImagePreview(null);
         setUploadError(null);
-        // Reset file input
         const fileInput = document.getElementById('custom-image-upload');
         if (fileInput) fileInput.value = '';
     };
 
-    // Helper function to ensure price is a number
+    // Parse price safely
     const parsePrice = (price) => {
         if (typeof price === 'number') return price;
         if (typeof price === 'string') {
-            const numericValue = parseFloat(price.replace(/[^\d.]/g, ''));
-            return isNaN(numericValue) ? 0 : numericValue;
+            const numeric = parseFloat(price.replace(/[^\d.]/g, ''));
+            return isNaN(numeric) ? 0 : numeric;
         }
         return 0;
+    };
+
+    // Image URL helper (recommended)
+    const getImageUrl = (url) => {
+        if (!url) return 'https://via.placeholder.com/400x500/eee/999?text=No+Image';
+        if (url.startsWith('http')) return url;
+        return `http://localhost:5000${url.startsWith('/') ? '' : '/'}${url}`;
     };
 
     useEffect(() => {
@@ -148,16 +148,10 @@ function PosterDetails() {
             if (!response.ok) throw new Error('Poster not found');
             const data = await response.json();
 
-            // Ensure price is a number
             const price = parsePrice(data.price);
             const originalPrice = price * 1.5;
 
-            const posterWithPrice = {
-                ...data,
-                price: price,
-                originalPrice: originalPrice
-            };
-            setPoster(posterWithPrice);
+            setPoster({ ...data, price, originalPrice });
         } catch (err) {
             setError(err.message);
         } finally {
@@ -169,7 +163,6 @@ function PosterDetails() {
         setLoadingRecommended(true);
         try {
             let url = 'http://localhost:5000/api/posters';
-
             if (poster.category_id) {
                 url = `http://localhost:5000/api/posters/category/${poster.category_id}`;
             }
@@ -177,36 +170,25 @@ function PosterDetails() {
             const response = await fetch(url);
             if (response.ok) {
                 let data = await response.json();
-
-                // Ensure prices are numbers in recommended posters too
-                data = data.map(poster => ({
-                    ...poster,
-                    price: parsePrice(poster.price)
-                }));
-
+                data = data.map(p => ({ ...p, price: parsePrice(p.price) }));
                 data = data.filter(p => p.id !== poster.id);
 
                 if (data.length < 4 && poster.category_id) {
-                    const additionalResponse = await fetch('http://localhost:5000/api/posters');
-                    if (additionalResponse.ok) {
-                        const additionalData = await additionalResponse.json();
-                        const additionalPosters = additionalData
-                            .filter(p => p.id !== poster.id && !data.some(dp => dp.id === p.id))
-                            .slice(0, 4 - data.length);
-
-                        const additionalPostersWithNumericPrices = additionalPosters.map(poster => ({
-                            ...poster,
-                            price: parsePrice(poster.price)
-                        }));
-
-                        data = [...data, ...additionalPostersWithNumericPrices];
+                    const additional = await fetch('http://localhost:5000/api/posters');
+                    if (additional.ok) {
+                        const extra = await additional.json();
+                        const more = extra
+                            .filter(p => p.id !== poster.id && !data.some(d => d.id === p.id))
+                            .slice(0, 4 - data.length)
+                            .map(p => ({ ...p, price: parsePrice(p.price) }));
+                        data = [...data, ...more];
                     }
                 }
 
                 setRecommendedPosters(data.slice(0, 4));
             }
         } catch (err) {
-            console.error('Failed to fetch recommended posters:', err);
+            console.error(err);
             fetchRandomPosters();
         } finally {
             setLoadingRecommended(false);
@@ -219,28 +201,20 @@ function PosterDetails() {
             const response = await fetch('http://localhost:5000/api/posters');
             if (response.ok) {
                 let data = await response.json();
-
-                // Ensure prices are numbers
-                data = data.map(poster => ({
-                    ...poster,
-                    price: parsePrice(poster.price)
-                }));
-
+                data = data.map(p => ({ ...p, price: parsePrice(p.price) }));
                 data = data.filter(p => p.id !== (poster?.id || id));
                 const shuffled = [...data].sort(() => 0.5 - Math.random());
                 setRecommendedPosters(shuffled.slice(0, 4));
             }
         } catch (err) {
-            console.error('Failed to fetch random posters:', err);
+            console.error(err);
         } finally {
             setLoadingRecommended(false);
         }
     };
 
-    // ✅ UPDATED: Handle both regular and custom posters
     const handleAddToCart = () => {
         if (isCustomPoster) {
-            // For custom poster, require image upload
             if (!customImage) {
                 setUploadError('Please upload your design first');
                 return;
@@ -251,34 +225,32 @@ function PosterDetails() {
                 title: "Custom Poster - Your Design",
                 price: poster.price,
                 image_url: imagePreview,
-                quantity: quantity,
+                quantity,
                 style: selectedStyle,
                 size: selectedSize,
                 frameColor: frameClass,
-                customImage: customImage,
+                customImage,
                 isCustom: true
             };
 
             addToCart(cartItem);
-            alert('Custom poster added to cart! We will print your design.');
+            alert('Custom poster added to cart!');
         } else {
-            // Regular poster
             if (poster && poster.stock > 0) {
                 const cartItem = {
                     id: poster.id,
                     title: poster.title,
                     price: poster.price,
                     image_url: poster.image_url,
-                    quantity: quantity,
+                    quantity,
                     style: selectedStyle,
                     size: selectedSize,
                     frameColor: frameClass
                 };
 
                 addToCart(cartItem);
-                alert('Added to cart!');
             } else {
-                alert('This poster is out of stock!');
+                alert('Out of stock!');
             }
         }
     };
@@ -288,19 +260,10 @@ function PosterDetails() {
         window.scrollTo(0, 0);
     };
 
-    const increaseQuantity = () => {
-        setQuantity(prev => prev + 1);
-    };
+    const increaseQuantity = () => setQuantity(prev => prev + 1);
+    const decreaseQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
 
-    const decreaseQuantity = () => {
-        setQuantity(prev => prev > 1 ? prev - 1 : 1);
-    };
-
-    // Safe price display function
-    const displayPrice = (price) => {
-        const numericPrice = parsePrice(price);
-        return `LE ${numericPrice.toFixed(2)}`;
-    };
+    const displayPrice = (price) => `LE ${parsePrice(price).toFixed(2)}`;
 
     if (loading) {
         return (
@@ -333,16 +296,13 @@ function PosterDetails() {
             <Navbar />
             <div className="poster-details-page">
                 <div className="poster-details-container">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="poster-details-back-btn"
-                    >
+                    <button onClick={() => navigate(-1)} className="poster-details-back-btn">
                         <ArrowLeft size={20} />
                         Back
                     </button>
 
                     <div className="poster-details-layout">
-                        {/* ✅ UPDATED: Conditional rendering for custom vs regular poster */}
+                        {/* IMAGE SECTION */}
                         <div className="poster-details-image-container">
                             {isCustomPoster ? (
                                 <div className="poster-details-custom-upload">
@@ -350,13 +310,10 @@ function PosterDetails() {
                                         <div className="poster-details-custom-preview">
                                             <img
                                                 src={imagePreview}
-                                                alt="Your custom design"
+                                                alt="Custom design"
                                                 className="poster-details-preview-image"
                                             />
-                                            <button
-                                                onClick={removeCustomImage}
-                                                className="poster-details-remove-image-btn"
-                                            >
+                                            <button onClick={removeCustomImage} className="poster-details-remove-image-btn">
                                                 <X size={20} />
                                             </button>
                                         </div>
@@ -376,15 +333,13 @@ function PosterDetails() {
                                         className="poster-details-file-input"
                                     />
                                     {uploadError && (
-                                        <div className="poster-details-upload-error">
-                                            {uploadError}
-                                        </div>
+                                        <div className="poster-details-upload-error">{uploadError}</div>
                                     )}
                                 </div>
                             ) : (
                                 <div className={`poster-details-frame ${frameClass}`}>
                                     <img
-                                        src={poster.image_url}
+                                        src={getImageUrl(poster.image_url)}
                                         alt={poster.title}
                                         className="poster-details-image-with-frame"
                                     />
@@ -392,7 +347,7 @@ function PosterDetails() {
                             )}
                         </div>
 
-                        {/* Product Details */}
+                        {/* PRODUCT DETAILS */}
                         <div className="poster-details-product-details">
                             <h1 className="poster-details-title">{poster.title}</h1>
 
@@ -423,22 +378,24 @@ function PosterDetails() {
                                 <div className="poster-details-custom-features">
                                     <h3>Custom Poster Features</h3>
                                     <ul>
-                                        <li>✓ High-quality poster printing</li>
-                                        <li>✓ Multiple sizes available</li>
-                                        <li>✓ Premium paper material</li>
-                                        <li>✓ Fast processing and shipping</li>
+                                        <li>High-quality poster printing</li>
+                                        <li>Multiple sizes available</li>
+                                        <li>Premium paper material</li>
+                                        <li>Fast processing and shipping</li>
                                     </ul>
                                 </div>
                             )}
 
-                            {/* Style Options */}
+                            {/* STYLE OPTIONS */}
                             <div className="poster-details-option-section">
                                 <h3>Style Option?</h3>
                                 <div className="poster-details-options-grid">
                                     {styleOptions.map(style => (
                                         <button
                                             key={style}
-                                            className={`poster-details-style-option ${selectedStyle === style ? 'active' : ''}`}
+                                            className={`poster-details-style-option ${
+                                                selectedStyle === style ? 'active' : ''
+                                            } ${style === '350 gsm Coated Paper' ? 'coated-paper-btn' : ''}`}
                                             onClick={() => handleStyleSelect(style)}
                                         >
                                             {style}
@@ -447,7 +404,7 @@ function PosterDetails() {
                                 </div>
                             </div>
 
-                            {/* Size Options */}
+                            {/* SIZE OPTIONS */}
                             <div className="poster-details-option-section">
                                 <h3>Size</h3>
                                 <div className="poster-details-options-grid">
@@ -463,28 +420,21 @@ function PosterDetails() {
                                 </div>
                             </div>
 
-                            {/* Quantity */}
+                            {/* QUANTITY */}
                             <div className="poster-details-quantity-section">
                                 <h3>Quantity</h3>
                                 <div className="poster-details-quantity-selector">
-                                    <button
-                                        className="poster-details-quantity-btn"
-                                        onClick={decreaseQuantity}
-                                        disabled={quantity <= 1}
-                                    >
+                                    <button className="poster-details-quantity-btn" onClick={decreaseQuantity} disabled={quantity <= 1}>
                                         <Minus size={16} />
                                     </button>
                                     <span className="poster-details-quantity-display">{quantity}</span>
-                                    <button
-                                        className="poster-details-quantity-btn"
-                                        onClick={increaseQuantity}
-                                    >
+                                    <button className="poster-details-quantity-btn" onClick={increaseQuantity}>
                                         <Plus size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
+                            {/* ACTION BUTTONS */}
                             <div className="poster-details-action-buttons">
                                 <button
                                     onClick={handleAddToCart}
@@ -495,27 +445,24 @@ function PosterDetails() {
                                     {isCustomPoster ? 'Add Custom Poster to Cart' : 'Add to Cart'}
                                 </button>
 
-                                <button
-                                    onClick={() => navigate('/shop')}
-                                    className="poster-details-btn poster-details-btn-outline"
-                                >
+                                <button onClick={() => navigate('/shop')} className="poster-details-btn poster-details-btn-outline">
                                     Continue Shopping
                                 </button>
                             </div>
 
-                            {/* Stock Info - Only for regular posters */}
+                            {/* STOCK INFO */}
                             {!isCustomPoster && (
                                 <div className="poster-details-stock-info">
                                     <Package size={16} />
                                     <span className={poster.stock > 0 ? 'poster-details-in-stock' : 'poster-details-out-of-stock'}>
-                                        {poster.stock > 0 ? `in stock` : 'Out of stock'}
+                                        {poster.stock > 0 ? 'in stock' : 'Out of stock'}
                                     </span>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    {/* You May Also Like Section - Only for regular posters */}
+                    {/* RECOMMENDED POSTERS */}
                     {!isCustomPoster && (recommendedPosters.length > 0 || loadingRecommended) && (
                         <div className="poster-details-recommended-section">
                             <h2>You may also like</h2>
@@ -527,27 +474,27 @@ function PosterDetails() {
                                 </div>
                             ) : (
                                 <div className="poster-details-recommended-grid">
-                                    {recommendedPosters.map((recommendedPoster) => (
+                                    {recommendedPosters.map((p) => (
                                         <div
-                                            key={recommendedPoster.id}
+                                            key={p.id}
                                             className="poster-details-recommended-poster-card"
-                                            onClick={() => handleRecommendedPosterClick(recommendedPoster.id)}
+                                            onClick={() => handleRecommendedPosterClick(p.id)}
                                         >
                                             <div className="poster-details-recommended-image-container">
                                                 <img
-                                                    src={recommendedPoster.image_url}
-                                                    alt={recommendedPoster.title}
+                                                    src={getImageUrl(p.image_url)}
+                                                    alt={p.title}
                                                     className="poster-details-recommended-poster-image"
                                                 />
                                             </div>
                                             <div className="poster-details-recommended-poster-info">
-                                                <h4>{recommendedPoster.title}</h4>
-                                                {recommendedPoster.category_name && (
-                                                    <p className="poster-details-recommended-poster-category">{recommendedPoster.category_name}</p>
+                                                <h4>{p.title}</h4>
+                                                {p.category_name && (
+                                                    <p className="poster-details-recommended-poster-category">{p.category_name}</p>
                                                 )}
-                                                <p className="poster-details-recommended-poster-price">{displayPrice(recommendedPoster.price)}</p>
+                                                <p className="poster-details-recommended-poster-price">{displayPrice(p.price)}</p>
                                                 <div className="poster-details-recommended-stock-badge">
-                                                    {recommendedPoster.stock > 0 ? (
+                                                    {p.stock > 0 ? (
                                                         <span className="poster-details-in-stock">In Stock</span>
                                                     ) : (
                                                         <span className="poster-details-out-of-stock">Out of Stock</span>

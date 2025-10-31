@@ -112,20 +112,6 @@ function Shop() {
         <>
             <Navbar/>
             <div className="shop-page">
-                {/*<div className="shop-header">*/}
-                {/*    <div className="shop-header-content">*/}
-                {/*        <h1>Shop <span className="shop-title-accent">All Posters</span></h1>*/}
-                {/*        <div className="shop-header-actions">*/}
-                {/*            <button*/}
-                {/*                className="shop-btn shop-btn-primary"*/}
-                {/*                onClick={() => navigate('/')}*/}
-                {/*            >*/}
-                {/*                <Home size={16}/>*/}
-                {/*                Home*/}
-                {/*            </button>*/}
-                {/*        </div>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
 
                 <div className="shop-layout">
                     <div className="shop-sidebar">

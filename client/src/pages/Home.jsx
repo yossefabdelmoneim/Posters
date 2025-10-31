@@ -331,6 +331,7 @@ const Home = () => {
                                 </ul>
                             </div>
 
+
                             {/* Help Section */}
                             <div className="home-menu-section">
                                 <h3><HelpCircle size={18}/> Help</h3>
